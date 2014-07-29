@@ -25,6 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_adhoc';
-$plugin->version   = 2014072900;
+$plugin->version   = 2014072901;
 $plugin->requires  = 2014051200;
 $plugin->cron      = 0;

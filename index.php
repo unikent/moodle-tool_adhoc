@@ -20,8 +20,11 @@ require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('adhoctaskmanager');
 
+$renderer = $PAGE->get_renderer('local_adhoc');
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_adhoc'));
 
+echo $renderer->adhoc_tasks_table();
 
 echo $OUTPUT->footer();

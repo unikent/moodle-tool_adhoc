@@ -24,3 +24,8 @@
 
 $string['pluginname'] = 'Adhoc Task Manager';
 $string['plugindesc'] = 'The adhoc task manager allows administrators to manage the adhoc queue.';
+$string['notasks'] = 'No adhoc tasks have been scheduled.';
+$string['customdata'] = 'Custom data';
+$string['id'] = 'ID';
+$string['blocking'] = 'Blocking?';
+$string['edittask'] = 'Edit Task';
