@@ -21,9 +21,20 @@ require_once($CFG->libdir . '/adminlib.php');
 admin_externalpage_setup('adhoctaskmanager');
 
 $renderer = $PAGE->get_renderer('local_adhoc');
+$action = optional_param('action', '', PARAM_ALPHA);
+$task = optional_param('task', '', PARAM_INT);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_adhoc'));
+
+if ($action == 'delete' && !empty($task)) {
+    $DB->delete_records('task_adhoc', array(
+        'id' => $task
+    ));
+
+    echo $OUTPUT->notification(get_string('success'), 'notifysuccess');
+    echo \html_writer::empty_tag('br');
+}
 
 echo $renderer->adhoc_tasks_table();
 

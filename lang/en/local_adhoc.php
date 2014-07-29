@@ -28,4 +28,4 @@ $string['notasks'] = 'No adhoc tasks have been scheduled.';
 $string['customdata'] = 'Custom data';
 $string['id'] = 'ID';
 $string['blocking'] = 'Blocking?';
-$string['edittask'] = 'Edit Task';
+$string['deletetask'] = 'Delete Task';

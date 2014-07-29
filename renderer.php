@@ -49,7 +49,7 @@ class local_adhoc_renderer extends plugin_renderer_base {
         $table->head  = array(
             get_string('id', 'local_adhoc'),
             get_string('component', 'tool_task'),
-            get_string('edit'),
+            get_string('delete'),
             get_string('name'),
             get_string('nextruntime', 'tool_task'),
             get_string('faildelay', 'tool_task'),
@@ -60,12 +60,12 @@ class local_adhoc_renderer extends plugin_renderer_base {
 
         $data = array();
         foreach ($tasks as $task) {
-            $configureurl = new moodle_url('/local/adhoc/edit.php', array(
-                'action' => 'edit',
-                'task' => get_class($task)
+            $configureurl = new moodle_url('/local/adhoc/index.php', array(
+                'action' => 'delete',
+                'task' => $task->id
             ));
 
-            $editlink = $this->action_icon($configureurl, new pix_icon('t/edit', get_string('edittask', 'local_adhoc')));
+            $editlink = $this->action_icon($configureurl, new pix_icon('t/delete', get_string('deletetask', 'local_adhoc')));
 
             $idcell = new html_table_cell($task->id);
             $idcell->header = true;
