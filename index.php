@@ -28,6 +28,8 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_adhoc'));
 
 if ($action == 'delete' && !empty($task)) {
+    require_sesskey();
+
     $DB->delete_records('task_adhoc', array(
         'id' => $task
     ));

@@ -62,7 +62,8 @@ class local_adhoc_renderer extends plugin_renderer_base {
         foreach ($tasks as $task) {
             $configureurl = new moodle_url('/local/adhoc/index.php', array(
                 'action' => 'delete',
-                'task' => $task->id
+                'task' => $task->id,
+                'sesskey' => sesskey()
             ));
 
             $editlink = $this->action_icon($configureurl, new pix_icon('t/delete', get_string('deletetask', 'local_adhoc')));
