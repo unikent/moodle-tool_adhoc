@@ -23,6 +23,8 @@ if ($hassiteconfig) {
         new \moodle_url("/local/adhoc/index.php")
     ));
 
+    $settings = new admin_settingpage('local_adhoc', get_string('pluginname', 'local_adhoc'));
+
     $settings->add(new admin_setting_configtext(
         'local_adhoc/nagios_warning_threshhold',
         'Adhoc queue threshold (warning)',
