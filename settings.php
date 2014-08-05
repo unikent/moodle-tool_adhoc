@@ -22,4 +22,20 @@ if ($hassiteconfig) {
         get_string('pluginname', 'local_adhoc'),
         new \moodle_url("/local/adhoc/index.php")
     ));
+
+    $settings = new admin_settingpage('local_adhoc', get_string('pluginname', 'local_adhoc'));
+
+    $settings->add(new admin_setting_configtext(
+        'local_adhoc/nagios_warning_threshhold',
+        'Adhoc queue threshold (warning)',
+        'The maximum allowed tasks in the adhoc queue before a warning is triggered.',
+        10, PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_adhoc/nagios_error_threshhold',
+        'Adhoc queue threshold (error)',
+        'The maximum allowed tasks in the adhoc queue before an error is triggered.',
+        25, PARAM_INT
+    ));
 }

@@ -15,16 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Adhoc task manager.
  *
  * @package    local_adhoc
- * @copyright  2014 University of Kent
+ * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'local_adhoc';
-$plugin->version   = 2014080400;
-$plugin->requires  = 2014051200;
-$plugin->cron      = 0;
+$nagios = array(
+    array(
+        'classname' => 'local_adhoc\nagios\queue_check'
+    )
+);
