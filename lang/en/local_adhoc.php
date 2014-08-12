@@ -17,7 +17,7 @@
 /**
  * Strings for the adhoc task manager
  *
- * @package    local_adhoc
+ * @package    tool_adhoc
  * @copyright  2014 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

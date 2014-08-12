@@ -20,12 +20,12 @@ require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('adhoctaskmanager');
 
-$renderer = $PAGE->get_renderer('local_adhoc');
+$renderer = $PAGE->get_renderer('tool_adhoc');
 $action = optional_param('action', '', PARAM_ALPHA);
 $task = optional_param('task', '', PARAM_INT);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('pluginname', 'local_adhoc'));
+echo $OUTPUT->heading(get_string('pluginname', 'tool_adhoc'));
 
 if ($action == 'delete' && !empty($task)) {
     require_sesskey();

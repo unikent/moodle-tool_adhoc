@@ -17,22 +17,22 @@
 /**
  * Adhoc task manager.
  *
- * @package    local_adhoc
+ * @package    tool_adhoc
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_adhoc\nagios;
+namespace tool_adhoc\nagios;
 
 /**
  * Checks cache.
  */
-class queue_check extends \local_nagios\base_check
+class queue_check extends \tool_nagios\base_check
 {
     public function execute() {
         global $DB;
 
-        $config = get_config('local_nagios');
+        $config = get_config('tool_nagios');
         $errorthreshold = isset($config->nagios_error_threshhold) ? $config->nagios_error_threshhold : 25;
         $warnthreshold = isset($config->nagios_warning_threshhold) ? $config->nagios_warning_threshhold : 10;
 
