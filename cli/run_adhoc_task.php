@@ -17,7 +17,7 @@
 /**
  * CLI task execution.
  *
- * @package    local_adhoc
+ * @package    tool_adhoc
  * @copyright  2014 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -48,7 +48,7 @@ Options:
 -h, --help    Print out this help
 
 Example:
-\$sudo -u www-data /usr/bin/php local/adhoc/cli/run_adhoc_task.php --execute=1
+\$sudo -u www-data /usr/bin/php admin/tool/adhoc/cli/run_adhoc_task.php --execute=1
 
 ";
 

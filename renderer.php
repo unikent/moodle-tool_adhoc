@@ -17,7 +17,7 @@
 /**
  * Output rendering for the plugin.
  *
- * @package    local_adhoc
+ * @package    tool_adhoc
  * @copyright  2014 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2014 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_adhoc_renderer extends plugin_renderer_base {
+class tool_adhoc_renderer extends plugin_renderer_base {
     /**
      * This function will render a table with all the adhoc tasks.
      *
@@ -42,31 +42,31 @@ class local_adhoc_renderer extends plugin_renderer_base {
         $tasks = $DB->get_records('task_adhoc');
 
         if (empty($tasks)) {
-            return \html_writer::tag('p', get_string('notasks', 'local_adhoc'));
+            return \html_writer::tag('p', get_string('notasks', 'tool_adhoc'));
         }
 
         $table = new html_table();
         $table->head  = array(
-            get_string('id', 'local_adhoc'),
+            get_string('id', 'tool_adhoc'),
             get_string('component', 'tool_task'),
             get_string('delete'),
             get_string('name'),
             get_string('nextruntime', 'tool_task'),
             get_string('faildelay', 'tool_task'),
-            get_string('customdata', 'local_adhoc'),
-            get_string('blocking', 'local_adhoc')
+            get_string('customdata', 'tool_adhoc'),
+            get_string('blocking', 'tool_adhoc')
         );
         $table->attributes['class'] = 'admintable generaltable';
 
         $data = array();
         foreach ($tasks as $task) {
-            $configureurl = new moodle_url('/local/adhoc/index.php', array(
+            $configureurl = new moodle_url('/admin/tool/adhoc/index.php', array(
                 'action' => 'delete',
                 'task' => $task->id,
                 'sesskey' => sesskey()
             ));
 
-            $editlink = $this->action_icon($configureurl, new pix_icon('t/delete', get_string('deletetask', 'local_adhoc')));
+            $editlink = $this->action_icon($configureurl, new pix_icon('t/delete', get_string('deletetask', 'tool_adhoc')));
 
             $idcell = new html_table_cell($task->id);
             $idcell->header = true;

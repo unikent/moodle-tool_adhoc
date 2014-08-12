@@ -17,14 +17,14 @@
 /**
  * Version information
  *
- * @package    local_adhoc
+ * @package    tool_adhoc
  * @copyright  2014 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_adhoc';
+$plugin->component = 'tool_adhoc';
 $plugin->version   = 2014080400;
 $plugin->requires  = 2014051200;
 $plugin->cron      = 0;

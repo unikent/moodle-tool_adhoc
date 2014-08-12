@@ -17,13 +17,13 @@
 /**
  * Adhoc task manager.
  *
- * @package    local_adhoc
+ * @package    tool_adhoc
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $nagios = array(
     array(
-        'classname' => 'local_adhoc\nagios\queue_check'
+        'classname' => 'tool_adhoc\nagios\queue_check'
     )
 );
