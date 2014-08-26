@@ -27,7 +27,7 @@ namespace tool_adhoc\nagios;
 /**
  * Checks cache.
  */
-class queue_check extends \tool_nagios\base_check
+class queue_check extends \local_nagios\base_check
 {
     public function execute() {
         global $DB;
