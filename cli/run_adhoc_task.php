@@ -136,6 +136,7 @@ if ($execute = $options['execute']) {
         mtrace("... used " . (microtime(true) - $pretime) . " seconds");
         mtrace("Task failed: " . $e->getMessage());
         \core\task\manager::adhoc_task_failed($task);
+        throw $e;
         exit(1);
     }
 }
