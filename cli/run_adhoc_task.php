@@ -28,6 +28,11 @@ require(dirname(__FILE__) . '/../../../../config.php');
 require_once("{$CFG->libdir}/clilib.php");
 require_once("{$CFG->libdir}/cronlib.php");
 
+if (moodle_needs_upgrading()) {
+    mtrace("Moodle upgrade pending, cannot execute tasks.");
+    exit(1);
+}
+
 list($options, $unrecognized) = cli_get_params(
     array('help' => false, 'list' => false, 'execute' => false, 'delete' => false),
     array('h' => 'help')
@@ -75,22 +80,12 @@ if ($execute = $options['execute']) {
     // Get the record.
     $record = $DB->get_record('task_adhoc', array(
         'id' => $execute
-    ));
-
-    if (!$record) {
-        mtrace("Task '{$execute}' not found.");
-        exit(1);
-    }
+    ), '*', \MUST_EXIST);
 
     $task = \core\task\manager::adhoc_task_from_record($record);
 
     if (!$task) {
-        mtrace("Task '{$execute}' could not be created.");
-        exit(1);
-    }
-
-    if (moodle_needs_upgrading()) {
-        mtrace("Moodle upgrade pending, cannot execute tasks.");
+        mtrace("Task '{$execute}' could not be executed.");
         exit(1);
     }
 

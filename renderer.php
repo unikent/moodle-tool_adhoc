@@ -50,6 +50,7 @@ class tool_adhoc_renderer extends plugin_renderer_base {
             get_string('id', 'tool_adhoc'),
             get_string('component', 'tool_task'),
             get_string('delete'),
+            get_string('run', 'tool_adhoc'),
             get_string('name'),
             get_string('nextruntime', 'tool_task'),
             get_string('faildelay', 'tool_task'),
@@ -67,6 +68,14 @@ class tool_adhoc_renderer extends plugin_renderer_base {
             ));
 
             $editlink = $this->action_icon($configureurl, new pix_icon('t/delete', get_string('deletetask', 'tool_adhoc')));
+
+            $runurl = new moodle_url('/admin/tool/adhoc/index.php', array(
+                'action' => 'run',
+                'task' => $task->id,
+                'sesskey' => sesskey()
+            ));
+
+            $runlink = $this->action_icon($runurl, new pix_icon('t/go', get_string('runtask', 'tool_adhoc')));
 
             $idcell = new html_table_cell($task->id);
             $idcell->header = true;
@@ -88,6 +97,7 @@ class tool_adhoc_renderer extends plugin_renderer_base {
                 $idcell,
                 $componentcell,
                 new html_table_cell($editlink),
+                new html_table_cell($runlink),
                 new html_table_cell($task->classname),
                 new html_table_cell($task->nextruntime),
                 new html_table_cell($task->faildelay),

@@ -29,3 +29,5 @@ $string['customdata'] = 'Custom data';
 $string['id'] = 'ID';
 $string['blocking'] = 'Blocking?';
 $string['deletetask'] = 'Delete Task';
+$string['run'] = 'Run';
+$string['runtask'] = 'Run Task';
