@@ -38,6 +38,58 @@ if ($action == 'delete' && !empty($task)) {
     echo \html_writer::empty_tag('br');
 }
 
+$messages = '';
+if ($action == 'run' && !empty($task)) {
+    require_sesskey();
+
+    raise_memory_limit(MEMORY_EXTRA);
+
+    // Run the task.
+    $record = $DB->get_record('task_adhoc', array(
+        'id' => $task
+    ), '*', \MUST_EXIST);
+
+    // Create the task.
+    $task = \core\task\manager::adhoc_task_from_record($record);
+    if ($task) {
+        $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
+
+        // If the task is supposed to block cron, do it.
+        if ($task->is_blocking()) {
+            if ($cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
+                $task->set_cron_lock($cronlock);
+            } else {
+                echo \html_writer::div('Could not obtain cron lock!', 'alert alert-error');
+            }
+        }
+
+        // Try and get a lock on the task.
+        if ($lock = $cronlockfactory->get_lock('adhoc_' . $record->id, 10)) {
+            $task->set_lock($lock);
+
+            // All okay! Execute.
+            try {
+                ob_start();
+                $task->execute();
+                $messages = ob_get_clean();
+
+                \core\task\manager::adhoc_task_complete($task);
+                echo \html_writer::div('Task complete!', 'alert alert-info');
+            } catch (\Exception $e) {
+                echo \html_writer::div('Task failed!', 'alert alert-error');
+                \core\task\manager::adhoc_task_failed($task);
+                throw $e;
+            }
+        } else {
+            echo \html_writer::div('Could not obtain task lock!', 'alert alert-error');
+        }
+    }
+}
+
 echo $renderer->adhoc_tasks_table();
+
+if (!empty($messages)) {
+    echo \html_writer::tag('pre', $messages);
+}
 
 echo $OUTPUT->footer();
