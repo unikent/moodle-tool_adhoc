@@ -24,9 +24,6 @@ $renderer = $PAGE->get_renderer('tool_adhoc');
 $action = optional_param('action', '', PARAM_ALPHA);
 $task = optional_param('task', '', PARAM_INT);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('pluginname', 'tool_adhoc'));
-
 if ($action == 'delete' && !empty($task)) {
     require_sesskey();
 
@@ -34,9 +31,11 @@ if ($action == 'delete' && !empty($task)) {
         'id' => $task
     ));
 
-    echo $OUTPUT->notification(get_string('success'), 'notifysuccess');
-    echo \html_writer::empty_tag('br');
+    redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('success'), 1);
 }
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('pluginname', 'tool_adhoc'));
 
 $messages = '';
 if ($action == 'run' && !empty($task)) {
