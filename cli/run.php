@@ -75,7 +75,6 @@ foreach ($tasks as $record) {
         }
         mtrace("Task {$record->id} completed.");
         \core\task\manager::adhoc_task_complete($task);
-        exit(0);
     } catch (Exception $e) {
         if ($DB->is_transaction_started()) {
             $DB->force_transaction_rollback();
