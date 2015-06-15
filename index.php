@@ -34,10 +34,6 @@ if ($action == 'delete' && !empty($task)) {
     redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('success'), 1);
 }
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('pluginname', 'tool_adhoc'));
-
-$messages = '';
 if ($action == 'run' && !empty($task)) {
     require_sesskey();
 
@@ -58,7 +54,7 @@ if ($action == 'run' && !empty($task)) {
             if ($cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
                 $task->set_cron_lock($cronlock);
             } else {
-                echo \html_writer::div('Could not obtain cron lock!', 'alert alert-error');
+                redirect(new \moodle_url('/admin/tool/adhoc/index.php'), 'Could not obtain cron lock!', 2);
             }
         }
 
@@ -70,25 +66,23 @@ if ($action == 'run' && !empty($task)) {
             try {
                 ob_start();
                 $task->execute();
-                $messages = ob_get_clean();
+                $messages = \ob_get_clean();
 
                 \core\task\manager::adhoc_task_complete($task);
-                echo \html_writer::div('Task complete!', 'alert alert-info');
+                redirect(new \moodle_url('/admin/tool/adhoc/index.php'), 'Task complete! ' . $messages, 1);
             } catch (\Exception $e) {
-                echo \html_writer::div('Task failed!', 'alert alert-error');
                 \core\task\manager::adhoc_task_failed($task);
                 throw $e;
             }
         } else {
-            echo \html_writer::div('Could not obtain task lock!', 'alert alert-error');
+            redirect(new \moodle_url('/admin/tool/adhoc/index.php'), 'Could not obtain task lock!', 2);
         }
     }
 }
 
-echo $renderer->adhoc_tasks_table();
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('pluginname', 'tool_adhoc'));
 
-if (!empty($messages)) {
-    echo \html_writer::tag('pre', $messages);
-}
+echo $renderer->adhoc_tasks_table();
 
 echo $OUTPUT->footer();
