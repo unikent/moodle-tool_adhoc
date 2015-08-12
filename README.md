@@ -1,4 +1,4 @@
-moodle-tool_adhoc
+Adhoc task tool
 ==================
 
 Adhoc task management interface for Moodle 2.7+
