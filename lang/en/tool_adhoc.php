@@ -18,7 +18,7 @@
  * Strings for the adhoc task manager
  *
  * @package    tool_adhoc
- * @copyright  2014 University of Kent
+ * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,3 +31,6 @@ $string['blocking'] = 'Blocking?';
 $string['deletetask'] = 'Delete Task';
 $string['run'] = 'Run';
 $string['runtask'] = 'Run Task';
+$string['error_cron_lock'] = 'Could not obtain cron lock!';
+$string['error_task_lock'] = 'Could not obtain task lock!';
+$string['task_complete'] = 'Task complete!';
