@@ -27,3 +27,5 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'tool_adhoc';
 $plugin->version   = 2015081200;
 $plugin->requires  = 2014051200;
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release = '1.1 (Build: 2015081200)';
