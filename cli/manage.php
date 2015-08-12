@@ -18,7 +18,7 @@
  * CLI task execution.
  *
  * @package    tool_adhoc
- * @copyright  2014 University of Kent
+ * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -76,18 +76,8 @@ if ($options['list']) {
     exit(0);
 }
 
-if ($execute = $options['execute']) {
-    // Get the record.
-    $record = $DB->get_record('task_adhoc', array(
-        'id' => $execute
-    ), '*', \MUST_EXIST);
-
-    $task = \core\task\manager::adhoc_task_from_record($record);
-
-    if (!$task) {
-        mtrace("Task '{$execute}' could not be executed.");
-        exit(1);
-    }
+if (!empty($options['execute'])) {
+    $execute = $options['execute'];
 
     // Increase memory limit.
     raise_memory_limit(MEMORY_EXTRA);
@@ -95,48 +85,18 @@ if ($execute = $options['execute']) {
     // Emulate normal session - we use admin account by default.
     cron_setup_user();
 
-    $predbqueries = $DB->perf_get_queries();
-    $pretime = microtime(true);
-    try {
-        // NOTE: it would be tricky to move this code to \core\task\manager class,
-        //       because we want to do detailed error reporting.
-        $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
-        if (!$cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
-            mtrace('Cannot obtain cron lock');
-            exit(129);
-        }
-        if (!$lock = $cronlockfactory->get_lock('adhoc_' . $record->id, 10)) {
-            mtrace('Cannot obtain task lock');
-            exit(130);
-        }
-        $task->set_lock($lock);
-        if (!$task->is_blocking()) {
-            $cronlock->release();
-        } else {
-            $task->set_cron_lock($cronlock);
-        }
-        $task->execute();
-        if (isset($predbqueries)) {
-            mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-            mtrace("... used " . (microtime(1) - $pretime) . " seconds");
-        }
-        mtrace("Task completed.");
-        \core\task\manager::adhoc_task_complete($task);
-        exit(0);
-    } catch (Exception $e) {
-        if ($DB->is_transaction_started()) {
-            $DB->force_transaction_rollback();
-        }
-        mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-        mtrace("... used " . (microtime(true) - $pretime) . " seconds");
-        mtrace("Task failed: " . $e->getMessage());
-        \core\task\manager::adhoc_task_failed($task);
-        throw $e;
-        exit(1);
-    }
+    // Get the record.
+    $record = $DB->get_record('task_adhoc', array(
+        'id' => $execute
+    ), '*', \MUST_EXIST);
+
+    // Execute.
+    \tool_adhoc\manager::run_tasks(array($record));
 }
 
-if ($delete = $options['delete']) {
+if (!empty($options['delete'])) {
+    $delete = $options['delete'];
+
     // Get the record.
     $record = $DB->get_record('task_adhoc', array(
         'id' => $delete

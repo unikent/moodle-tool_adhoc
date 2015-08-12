@@ -39,54 +39,11 @@ raise_memory_limit(MEMORY_EXTRA);
 // Emulate normal session - we use admin account by default.
 cron_setup_user();
 
-// NOTE: it would be tricky to move this code to \core\task\manager class,
-//       because we want to do detailed error reporting.
-$cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
-if (!$cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
-    mtrace('Cannot obtain cron lock');
-    exit(129);
-}
-
+// Run all tasks.
 $tasks = $DB->get_records('task_adhoc');
-
-foreach ($tasks as $record) {
-    $task = \core\task\manager::adhoc_task_from_record($record);
-
-    if (!$task) {
-        mtrace("Task '{$record->id}' could not be executed.");
-        exit(1);
-    }
-
-    $predbqueries = $DB->perf_get_queries();
-    $pretime = microtime(true);
-    try {
-        if (!$lock = $cronlockfactory->get_lock('adhoc_' . $record->id, 10)) {
-            mtrace('Cannot obtain task lock');
-            continue;
-        }
-        $task->set_lock($lock);
-        if ($task->is_blocking()) {
-            $task->set_cron_lock($cronlock);
-        }
-        $task->execute();
-        if (isset($predbqueries)) {
-            mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-            mtrace("... used " . (microtime(1) - $pretime) . " seconds");
-        }
-        mtrace("Task {$record->id} completed.");
-        \core\task\manager::adhoc_task_complete($task);
-    } catch (Exception $e) {
-        if ($DB->is_transaction_started()) {
-            $DB->force_transaction_rollback();
-        }
-        mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-        mtrace("... used " . (microtime(true) - $pretime) . " seconds");
-        mtrace("Task failed: " . $e->getMessage());
-        \core\task\manager::adhoc_task_failed($task);
-        $cronlock->release();
-        throw $e;
-        exit(1);
-    }
+if (!empty($tasks)) {
+    mtrace("Running " . count($tasks) . " tasks.");
+    \tool_adhoc\manager::run_tasks($tasks);
+} else {
+    mtrace("No tasks to run!");
 }
-
-$cronlock->release();

@@ -54,7 +54,7 @@ if ($action == 'run' && !empty($task)) {
             if ($cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
                 $task->set_cron_lock($cronlock);
             } else {
-                redirect(new \moodle_url('/admin/tool/adhoc/index.php'), 'Could not obtain cron lock!', 2);
+                redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('error_cron_lock', 'tool_adhoc'), 2);
             }
         }
 
@@ -69,13 +69,13 @@ if ($action == 'run' && !empty($task)) {
                 $messages = \ob_get_clean();
 
                 \core\task\manager::adhoc_task_complete($task);
-                redirect(new \moodle_url('/admin/tool/adhoc/index.php'), 'Task complete! ' . $messages, 1);
+                redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('task_complete', 'tool_adhoc') . ' ' . $messages, 1);
             } catch (\Exception $e) {
                 \core\task\manager::adhoc_task_failed($task);
                 throw $e;
             }
         } else {
-            redirect(new \moodle_url('/admin/tool/adhoc/index.php'), 'Could not obtain task lock!', 2);
+            redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('error_task_lock', 'tool_adhoc'), 2);
         }
     }
 }
