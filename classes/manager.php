@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Main API for the adhoc task manager.
+ *
+ * @package    tool_adhoc
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace tool_adhoc;
 
 /**
@@ -28,6 +36,7 @@ class manager
     /**
      * Run a given set of tasks.
      *
+     * @param array $records An array of adhoc DB records to run.
      * @return bool True if we succeeded, false if we didnt.
      */
     public static function run_tasks($records) {
