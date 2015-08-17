@@ -90,6 +90,12 @@ if ($action == 'run' && !empty($task)) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'tool_adhoc'));
 
-echo $renderer->adhoc_tasks_table();
+$tasks = $DB->get_records('task_adhoc');
+
+if (empty($tasks)) {
+    echo $renderer->empty_list();
+} else {
+    echo $renderer->adhoc_tasks_table($tasks);
+}
 
 echo $OUTPUT->footer();

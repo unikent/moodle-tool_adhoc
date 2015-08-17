@@ -34,16 +34,11 @@ class tool_adhoc_renderer extends plugin_renderer_base {
     /**
      * This function will render a table with all the adhoc tasks.
      *
+     * @param array $tasks An array of task objects from the DB.
      * @return string HTML to output.
      */
-    public function adhoc_tasks_table() {
-        global $CFG, $DB;
-
-        $tasks = $DB->get_records('task_adhoc');
-
-        if (empty($tasks)) {
-            return \html_writer::tag('p', get_string('notasks', 'tool_adhoc'));
-        }
+    public function adhoc_tasks_table($tasks) {
+        global $CFG;
 
         $table = new html_table();
         $table->head  = array(
@@ -110,5 +105,12 @@ class tool_adhoc_renderer extends plugin_renderer_base {
 
         $table->data = $data;
         return html_writer::table($table);
+    }
+
+    /**
+     * Render an empty list message.
+     */
+    public function empty_list() {
+        return \html_writer::tag('p', get_string('notasks', 'tool_adhoc'));
     }
 }
