@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This page displays adhoc tasks and allows basic management.
+ *
+ * @package    tool_adhoc
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -83,6 +90,12 @@ if ($action == 'run' && !empty($task)) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'tool_adhoc'));
 
-echo $renderer->adhoc_tasks_table();
+$tasks = $DB->get_records('task_adhoc');
+
+if (empty($tasks)) {
+    echo $renderer->empty_list();
+} else {
+    echo $renderer->adhoc_tasks_table($tasks);
+}
 
 echo $OUTPUT->footer();
