@@ -43,7 +43,6 @@ if ($action == 'delete' && !empty($task)) {
 
 if ($action == 'run' && !empty($task)) {
     require_sesskey();
-
     raise_memory_limit(MEMORY_EXTRA);
 
     // Run the task.
@@ -54,6 +53,10 @@ if ($action == 'run' && !empty($task)) {
     // Create the task.
     $task = \core\task\manager::adhoc_task_from_record($record);
     if ($task) {
+        $olduser = $USER;
+        $redirecturl = new \moodle_url('/admin/tool/adhoc/index.php');
+        $redirectmessage = '';
+
         $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
 
         // If the task is supposed to block cron, do it.
@@ -61,7 +64,7 @@ if ($action == 'run' && !empty($task)) {
             if ($cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
                 $task->set_cron_lock($cronlock);
             } else {
-                redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('error_cron_lock', 'tool_adhoc'), 2);
+                redirect($redirecturl, get_string('error_cron_lock', 'tool_adhoc'), 2);
             }
         }
 
@@ -76,14 +79,22 @@ if ($action == 'run' && !empty($task)) {
                 $messages = \ob_get_clean();
 
                 \core\task\manager::adhoc_task_complete($task);
-                redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('task_complete', 'tool_adhoc') . ' ' . $messages, 1);
+
+                $redirectmessage = get_string('task_complete', 'tool_adhoc') . ' ' . $messages;
             } catch (\Exception $e) {
                 \core\task\manager::adhoc_task_failed($task);
                 throw $e;
             }
         } else {
-            redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('error_task_lock', 'tool_adhoc'), 2);
+            $redirectmessage = get_string('error_task_lock', 'tool_adhoc');
         }
+
+        if ($USER->id !== $olduser->id) {
+            $olduser = $DB->get_record('user', array('id' => $olduser->id));
+            \core\session\manager::set_user($olduser);
+        }
+
+        redirect($redirecturl, $redirectmessage);
     }
 }
 
