@@ -44,10 +44,7 @@ class manager
 
         // Get the cron lock factory.
         $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
-        if (!$cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
-            mtrace('Cannot obtain cron lock');
-            return false;
-        }
+        $cronlock = null;
 
         foreach ($records as $record) {
             // Grab the task.
@@ -71,6 +68,10 @@ class manager
                 // Set lock info on task.
                 $task->set_lock($lock);
                 if ($task->is_blocking()) {
+                    if (!$cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
+                        mtrace('Cannot obtain cron lock');
+                        continue;
+                    }
                     $task->set_cron_lock($cronlock);
                 }
 
@@ -99,13 +100,19 @@ class manager
                 \core\task\manager::adhoc_task_failed($task);
 
                 // Release the global lock before we throw errors.
-                $cronlock->release();
+                if ($cronlock) {
+                    $cronlock->release();
+                    unset($cronlock);
+                }
 
                 throw $e;
             }
         }
 
         // Release the global lock.
-        $cronlock->release();
+        if ($cronlock) {
+            $cronlock->release();
+            unset($cronlock);
+        }
     }
 }
