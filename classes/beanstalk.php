@@ -92,14 +92,12 @@ class beanstalk
         while($job = $this->api->reserve()) {
             $received = json_decode($job->getData(), true);
 
-            // Sanity check.
-            if (!is_array($received)) {
-                continue;
-            }
-
             // Structure check.
-            if (!isset($recieved['class']) || !isset($recieved['method'])) {
+            if (!is_array($received) || !isset($recieved['class']) || !isset($recieved['method'])) {
                 echo "Recieved invalid job: " . json_encode($received);
+                $this->api->bury($job);
+
+                continue;
             }
 
             // We have something to do!

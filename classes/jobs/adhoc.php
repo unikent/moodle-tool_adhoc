@@ -15,27 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page displays beanstalk stats.
+ * Beanstalk jobs.
  *
  * @package    tool_adhoc
+ * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
  * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
+namespace tool_adhoc\jobs;
 
-admin_externalpage_setup('beanstalktaskmanager');
+/**
+ * Adhoc task tasks.
+ */
+class adhoc
+{
+    /**
+     * Run an adhoc task.
+     */
+    public function run_task($id) {
+        global $DB;
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading('Beanstalk manager');
+        $task = $DB->get_record('task_adhoc', array('id' => $id));
+        if ($task) {
+            \tool_adhoc\manager::run_tasks(array($task), true);
+        }
 
-$beanstalk = new \tool_adhoc\beanstalk();
-$info = $beanstalk->statsTube($beanstalk->get_tube());
-if ($info['current-jobs-buried'] > 0) {
-    print_r($beanstalk->peekBuried($beanstalk->get_tube()));
+        return true;
+    }
 }
-
-$beanstalk->add_job('test', 'test');
-
-echo $OUTPUT->footer();

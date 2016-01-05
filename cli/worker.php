@@ -29,5 +29,8 @@ require(dirname(__FILE__) . '/../../../../config.php');
 // Increase memory limit.
 raise_memory_limit(MEMORY_EXTRA);
 
+// Emulate normal session - we use admin account by default.
+cron_setup_user();
+
 $beanstalk = new \tool_adhoc\beanstalk();
 $beanstalk->become_worker();

@@ -32,7 +32,13 @@ echo $OUTPUT->heading('Beanstalk information');
 
 echo $OUTPUT->heading('Tube stats', 2);
 
+$ms = microtime(true);
 $beanstalk = new \tool_adhoc\beanstalk();
+echo microtime(true) - $ms . " and ";
+$ms = microtime(true);
+$beanstalk->add_job('test', 'test');
+echo microtime(true) - $ms;
+
 $info = $beanstalk->tube_stats();
 
 $pod = new \local_kent\arbitrarypod();
