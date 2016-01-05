@@ -15,31 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Adhoc manager settings.
+ * Run all adhoc tasks.
  *
  * @package    tool_adhoc
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+define('CLI_SCRIPT', true);
 
-if ($hassiteconfig) {
-    $ADMIN->add('tools', new admin_externalpage(
-        'adhoctaskmanager',
-        get_string('pluginname', 'tool_adhoc'),
-        new \moodle_url("/admin/tool/adhoc/index.php")
-    ));
+require(dirname(__FILE__) . '/../../../../config.php');
 
-    $ADMIN->add('tools', new admin_externalpage(
-        'beanstalktaskstats',
-        'Beanstalk stats',
-        new \moodle_url("/admin/tool/adhoc/beanstalk/index.php")
-    ));
+// Increase memory limit.
+raise_memory_limit(MEMORY_EXTRA);
 
-    $ADMIN->add('tools', new admin_externalpage(
-        'beanstalktaskmanager',
-        'Beanstalk manager',
-        new \moodle_url("/admin/tool/adhoc/beanstalk/manage.php")
-    ));
-}
+$beanstalk = new \tool_adhoc\beanstalk();
+$beanstalk->become_worker();

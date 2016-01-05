@@ -15,31 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Adhoc manager settings.
+ * This page displays beanstalk stats.
  *
  * @package    tool_adhoc
- * @copyright  2015 University of Kent
+ * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+require_once(dirname(__FILE__) . '/../../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 
-if ($hassiteconfig) {
-    $ADMIN->add('tools', new admin_externalpage(
-        'adhoctaskmanager',
-        get_string('pluginname', 'tool_adhoc'),
-        new \moodle_url("/admin/tool/adhoc/index.php")
-    ));
+admin_externalpage_setup('beanstalktaskmanager');
 
-    $ADMIN->add('tools', new admin_externalpage(
-        'beanstalktaskstats',
-        'Beanstalk stats',
-        new \moodle_url("/admin/tool/adhoc/beanstalk/index.php")
-    ));
+echo $OUTPUT->header();
+echo $OUTPUT->heading('Beanstalk manager');
 
-    $ADMIN->add('tools', new admin_externalpage(
-        'beanstalktaskmanager',
-        'Beanstalk manager',
-        new \moodle_url("/admin/tool/adhoc/beanstalk/manage.php")
-    ));
+$beanstalk = new \tool_adhoc\beanstalk();
+$info = $beanstalk->statsTube($beanstalk->get_tube());
+if ($info['current-jobs-buried'] > 0) {
+    print_r($beanstalk->peekBuried($beanstalk->get_tube()));
 }
+
+echo $OUTPUT->footer();
