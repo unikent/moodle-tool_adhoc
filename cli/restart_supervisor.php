@@ -15,37 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Beanstalk jobs.
+ * Restart supervisord.
  *
  * @package    tool_adhoc
- * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright  2016 University of Kent
+ * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_adhoc\jobs;
+define('CLI_SCRIPT', true);
 
-use Supervisor\Supervisor;
-use Supervisor\Connector\XmlRpc;
-use fXmlRpc\Client;
+require(dirname(__FILE__) . '/../../../../config.php');
 
-/**
- * Supervisord tasks.
- */
-class supervisord
-{
-    /**
-     * Restart supervisord.
-     */
-    public function restart() {
-        $client = new Client(
-            'unix:///var/run/supervisor/supervisor.sock'
-        );
-        $connector = new XmlRpc($client);
-
-        $supervisor = new Supervisor($connector);
-        $supervisor->restart();
-
-        return true;
-    }
-}
+$beanstalk = new \tool_adhoc\beanstalk();
+$beanstalk->add_job('\\tool_adhoc\\jobs\\supervisord', 'restart');
