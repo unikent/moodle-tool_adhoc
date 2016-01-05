@@ -35,19 +35,29 @@ use Pheanstalk\PheanstalkInterface;
  */
 class beanstalk
 {
+    private $config;
+    private $enabled;
     private $api;
 
     /**
      * Constructor.
      */
     public function __construct() {
-        $this->api = new Pheanstalk('127.0.0.1', PheanstalkInterface::DEFAULT_PORT, 1);
+        $this->config = get_config('tool_adhoc');
+        $this->enabled = isset($this->config->beanstalk_enabled) && $this->config->beanstalk_enabled;
+        if ($this->enabled) {
+            $this->api = new Pheanstalk($this->config->beanstalk_hostname, $this->config->beanstalk_port, $this->config->beanstalk_timeout);
+        }
     }
 
     /**
      * Magic.
      */
     public function __call($method, $arguments) {
+        if (!$this->enabled) {
+            return false;
+        }
+
         return call_user_func_array(array($this->api, $method), $arguments);
     }
 
@@ -55,9 +65,7 @@ class beanstalk
      * Return our tube name.
      */
     public function get_tube() {
-        global $CFG;
-
-        return "moodle-{$CFG->kent->distribution}-tasks";
+        return $this->config->beanstalk_tubename;
     }
 
     /**
@@ -68,14 +76,12 @@ class beanstalk
      * @param array  $args     The args to send the above method.
      * @param int    $priority From 0 (most urgent) to 0xFFFFFFFF (least urgent)
      * @param int    $delay    Seconds to wait before job becomes ready
-     * @param int    $ttr      Time To Run: seconds a job can be reserved for
+     * @param int    $timeout  Time To Run: seconds a job can be reserved for
      */
     public function add_job($class, $method, $args = array(), $timeout = 900,
                             $priority = PheanstalkInterface::DEFAULT_PRIORITY,
                             $delay = PheanstalkInterface::DEFAULT_DELAY) {
-        global $CFG;
-
-        return $this->api->putInTube($this->get_tube(), json_encode(array(
+        return $this->putInTube($this->get_tube(), json_encode(array(
             'class' => $class,
             'method' => $method,
             'args' => $args
@@ -86,16 +92,18 @@ class beanstalk
      * Initialize worker.
      */
     public function become_worker() {
-        global $CFG;
+        if (!$this->enabled) {
+            return false;
+        }
 
-        $this->api->watch($this->get_tube());
-        while($job = $this->api->reserve()) {
+        $this->watch($this->get_tube());
+        while($job = $this->reserve()) {
             $received = json_decode($job->getData(), true);
 
             // Structure check.
             if (!is_array($received) || !isset($recieved['class']) || !isset($recieved['method'])) {
                 echo "Recieved invalid job: " . json_encode($received);
-                $this->api->bury($job);
+                $this->bury($job);
 
                 continue;
             }
@@ -106,20 +114,23 @@ class beanstalk
             $obj = new $class();
             if (call_user_method(array($obj, $recieved['method']), $args)) {
                 // Success!
-                $this->api->delete($job);
+                $this->delete($job);
             } else {
                 // Fail.
-                $this->api->bury($job);
+                $this->bury($job);
             }
         }
     }
 
     /**
-     * Return beanstalk stats.
+     * Hook for queue_adhoc_task.
      */
-    public function tube_stats() {
-        global $CFG;
+    public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
+        if (!$this->enabled) {
+            return false;
+        }
 
-        return $this->api->statsTube($this->get_tube());
+        $beanstalk = new static();
+        $beanstalk->add_job("\\tool_adhoc\\jobs\\adhoc", 'run_task', array($id), 900, $priority);
     }
 }

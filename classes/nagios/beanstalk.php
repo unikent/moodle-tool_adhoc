@@ -36,7 +36,7 @@ class beanstalk extends \local_nagios\base_check
             if (!$beanstalk->getConnection()->isServiceListening()) {
                 $this->error('Beanstalk isn\'t listening to me!');
             } else {
-                $info = $beanstalk->tube_stats();
+                $info = $beanstalk->statsTube($beanstalk->get_tube());
 
                 if ($info['current-watching'] <= 5) {
                     $this->error('Less than 5 Beanstalk workers found! (found ' . $info['current-watching'] . ')');
