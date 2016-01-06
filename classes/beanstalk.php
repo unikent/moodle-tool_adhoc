@@ -97,13 +97,13 @@ class beanstalk
         }
 
         $this->watch($this->get_tube());
-        while($job = $this->reserve()) {
+        while ($job = $this->reserve()) {
             $received = json_decode($job->getData(), true);
 
             // Structure check.
             if (!is_array($received) || !isset($recieved['class']) || !isset($recieved['method'])) {
-                echo "Recieved invalid job: " . json_encode($received);
-                $this->bury($job);
+                cli_writeln("Recieved invalid job: " . json_encode($received));
+                $this->delete($job);
 
                 continue;
             }
@@ -111,14 +111,18 @@ class beanstalk
             // We have something to do!
             $args = isset($recieved['args']) ? $recieved['args'] : array();
             $class = $recieved['class'];
-            $obj = new $class();
-            if (call_user_method(array($obj, $recieved['method']), $args)) {
-                // Success!
-                $this->delete($job);
-            } else {
-                // Fail.
-                $this->bury($job);
+
+            // Run!
+            try {
+                $obj = new $class();
+                if (!call_user_method(array($obj, $recieved['method']), $args)) {
+                    cli_writeln("Invalid class: " . json_encode($received));
+                }
+            } catch (\Exception $e) {
+                cli_writeln("Exception thrown: " . $e->getMessage());
             }
+
+            $this->delete($job);
         }
     }
 
@@ -126,10 +130,6 @@ class beanstalk
      * Hook for queue_adhoc_task.
      */
     public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
-        if (!$this->enabled) {
-            return false;
-        }
-
         $beanstalk = new static();
         $beanstalk->add_job("\\tool_adhoc\\jobs\\adhoc", 'run_task', array($id), 900, $priority);
     }

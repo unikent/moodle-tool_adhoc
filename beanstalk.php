@@ -22,20 +22,39 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../../../config.php');
+require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-admin_externalpage_setup('beanstalktaskmanager');
+admin_externalpage_setup('beanstalktaskstats');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading('Beanstalk manager');
+echo $OUTPUT->heading('Beanstalk information');
+
+echo $OUTPUT->heading('Tube stats', 2);
 
 $beanstalk = new \tool_adhoc\beanstalk();
+
 $info = $beanstalk->statsTube($beanstalk->get_tube());
-if ($info['current-jobs-buried'] > 0) {
-    print_r($beanstalk->peekBuried($beanstalk->get_tube()));
+
+$pod = new \local_kent\arbitrarypod();
+foreach ($info as $k => $v) {
+    $pod->$k = $v;
 }
 
-$beanstalk->add_job('test', 'test');
+$table = $pod->get_flexible_table();
+$table->finish_output();
+
+echo $OUTPUT->heading('Beanstalk stats', 2);
+
+$beanstalk = new \tool_adhoc\beanstalk();
+$info = $beanstalk->stats();
+
+$pod = new \local_kent\arbitrarypod();
+foreach ($info as $k => $v) {
+    $pod->$k = $v;
+}
+
+$table = $pod->get_flexible_table();
+$table->finish_output();
 
 echo $OUTPUT->footer();

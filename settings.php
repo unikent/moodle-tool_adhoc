@@ -34,12 +34,6 @@ if ($hassiteconfig) {
     $ADMIN->add('tools', new admin_externalpage(
         'beanstalktaskstats',
         'Beanstalk stats',
-        new \moodle_url("/admin/tool/adhoc/beanstalk/index.php")
-    ));
-
-    $ADMIN->add('tools', new admin_externalpage(
-        'beanstalktaskmanager',
-        'Beanstalk manager',
-        new \moodle_url("/admin/tool/adhoc/beanstalk/manage.php")
+        new \moodle_url("/admin/tool/adhoc/beanstalk.php")
     ));
 }

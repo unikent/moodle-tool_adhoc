@@ -25,6 +25,8 @@
 define('CLI_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../../../config.php');
+require_once("{$CFG->libdir}/clilib.php");
+require_once("{$CFG->libdir}/cronlib.php");
 
 // Increase memory limit.
 raise_memory_limit(MEMORY_EXTRA);
