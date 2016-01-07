@@ -34,9 +34,8 @@ echo $OUTPUT->heading('Tube stats', 2);
 
 $beanstalk = new \tool_adhoc\beanstalk();
 
-$info = $beanstalk->statsTube($beanstalk->get_tube());
-
 $pod = new \local_kent\arbitrarypod();
+$info = $beanstalk->statsTube($beanstalk->get_tube());
 foreach ($info as $k => $v) {
     $pod->$k = $v;
 }
@@ -46,10 +45,8 @@ $table->finish_output();
 
 echo $OUTPUT->heading('Beanstalk stats', 2);
 
-$beanstalk = new \tool_adhoc\beanstalk();
-$info = $beanstalk->stats();
-
 $pod = new \local_kent\arbitrarypod();
+$info = $beanstalk->stats();
 foreach ($info as $k => $v) {
     $pod->$k = $v;
 }
