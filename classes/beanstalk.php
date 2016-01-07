@@ -45,8 +45,22 @@ class beanstalk
     public function __construct() {
         $this->config = get_config('tool_adhoc');
         $this->enabled = isset($this->config->beanstalk_enabled) && $this->config->beanstalk_enabled;
-        if ($this->enabled) {
-            $this->api = new Pheanstalk($this->config->beanstalk_hostname, $this->config->beanstalk_port, $this->config->beanstalk_timeout);
+        if (isset($this->config->beanstalk_unavailable)) {
+            if (time() - $this->config->beanstalk_unavailable < 18000) {
+                // Beanstalk has been down in the last 5 minutes, don't try it.
+                $this->enabled = false;
+            } else {
+                unset_config('beanstalk_unavailable', 'tool_adhoc');
+            }
+        }
+
+        try {
+            if ($this->enabled) {
+                $this->api = new Pheanstalk($this->config->beanstalk_hostname, $this->config->beanstalk_port, $this->config->beanstalk_timeout);
+            }
+        } catch (\Exception $e) {
+            // Not ready?
+            $this->enabled = false;
         }
     }
 
@@ -58,7 +72,17 @@ class beanstalk
             return false;
         }
 
-        return call_user_func_array(array($this->api, $method), $arguments);
+        $result = false;
+
+        try {
+            $result = call_user_func_array(array($this->api, $method), $arguments);
+        } catch (\Pheanstalk\Exception\ConnectionException $e) {
+            // Not ready?
+            $this->enabled = false;
+            set_config('beanstalk_unavailable', time(), 'tool_adhoc');
+        }
+
+        return $result;
     }
 
     /**
