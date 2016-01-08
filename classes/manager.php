@@ -28,8 +28,8 @@ namespace tool_adhoc;
  * Adhoc manager methods.
  *
  * @package   tool_adhoc
- * @copyright 2015 University of Kent
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2016 University of Kent
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager
 {
@@ -39,7 +39,7 @@ class manager
      * @param array $records An array of adhoc DB records to run.
      * @return bool True if we succeeded, false if we didnt.
      */
-    public static function run_tasks($records) {
+    public static function run_tasks($records, $failonblock = false) {
         global $DB;
 
         // Get the cron lock factory.
@@ -51,6 +51,10 @@ class manager
             $task = \core\task\manager::adhoc_task_from_record($record);
             if (!$task) {
                 mtrace("Task '{$record->id}' could not be loaded.");
+                continue;
+            }
+
+            if ($failonblock && $task->is_blocking()) {
                 continue;
             }
 

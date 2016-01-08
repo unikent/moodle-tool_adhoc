@@ -15,25 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Adhoc manager settings.
+ * Nagios definitions for tool_adhoc.
  *
  * @package    tool_adhoc
- * @copyright  2015 University of Kent
+ * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
-
-if ($hassiteconfig) {
-    $ADMIN->add('tools', new admin_externalpage(
-        'adhoctaskmanager',
-        get_string('pluginname', 'tool_adhoc'),
-        new \moodle_url("/admin/tool/adhoc/index.php")
-    ));
-
-    $ADMIN->add('tools', new admin_externalpage(
-        'beanstalktaskstats',
-        'Beanstalk stats',
-        new \moodle_url("/admin/tool/adhoc/beanstalk.php")
-    ));
-}
+$nagios = array(
+    array(
+        'classname' => 'tool_adhoc\nagios\beanstalk'
+    )
+);

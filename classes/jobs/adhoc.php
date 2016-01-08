@@ -15,25 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Adhoc manager settings.
+ * Beanstalk jobs.
  *
  * @package    tool_adhoc
- * @copyright  2015 University of Kent
+ * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+namespace tool_adhoc\jobs;
 
-if ($hassiteconfig) {
-    $ADMIN->add('tools', new admin_externalpage(
-        'adhoctaskmanager',
-        get_string('pluginname', 'tool_adhoc'),
-        new \moodle_url("/admin/tool/adhoc/index.php")
-    ));
+/**
+ * Adhoc task tasks.
+ */
+class adhoc
+{
+    /**
+     * Run an adhoc task.
+     */
+    public function run_task($id) {
+        global $DB;
 
-    $ADMIN->add('tools', new admin_externalpage(
-        'beanstalktaskstats',
-        'Beanstalk stats',
-        new \moodle_url("/admin/tool/adhoc/beanstalk.php")
-    ));
+        $task = $DB->get_record('task_adhoc', array('id' => $id));
+        if ($task) {
+            \tool_adhoc\manager::run_tasks(array($task), true);
+        }
+
+        return true;
+    }
 }
