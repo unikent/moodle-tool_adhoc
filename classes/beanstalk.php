@@ -125,21 +125,21 @@ class beanstalk
             $received = json_decode($job->getData(), true);
 
             // Structure check.
-            if (!is_array($received) || !isset($recieved['class']) || !isset($recieved['method'])) {
-                cli_writeln("Recieved invalid job: " . json_encode($received));
+            if (!is_array($received) || !isset($received['class']) || !isset($received['method'])) {
+                cli_writeln("Received invalid job: " . json_encode($received));
                 $this->delete($job);
 
                 continue;
             }
 
             // We have something to do!
-            $args = isset($recieved['args']) ? $recieved['args'] : array();
-            $class = $recieved['class'];
+            $args = isset($received['args']) ? $received['args'] : array();
+            $class = $received['class'];
 
             // Run!
             try {
                 $obj = new $class();
-                if (!call_user_method(array($obj, $recieved['method']), $args)) {
+                if (!call_user_func_array(array($obj, $received['method']), $args)) {
                     cli_writeln("Invalid class: " . json_encode($received));
                 }
             } catch (\Exception $e) {
@@ -155,6 +155,6 @@ class beanstalk
      */
     public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
         $beanstalk = new static();
-        $beanstalk->add_job("\\tool_adhoc\\jobs\\adhoc", 'run_task', array($id), 900, $priority);
+        $beanstalk->add_job('\\tool_adhoc\\jobs\\adhoc', 'run_task', array($id), 900, $priority);
     }
 }
