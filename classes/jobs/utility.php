@@ -26,21 +26,24 @@
 namespace tool_adhoc\jobs;
 
 /**
- * Adhoc task tasks.
+ * Utility tasks.
  */
-class adhoc
+class utility
 {
     /**
      * Run an adhoc task.
      */
-    public function run_task($id) {
-        global $DB;
-
-        $task = $DB->get_record('task_adhoc', array('id' => $id));
-        if ($task) {
-            \tool_adhoc\manager::run_tasks(array($task), true);
-        }
+    public function kick() {
+        cli_writeln("Kicked worker.");
 
         return \tool_adhoc\beanstalk::STATUS_OK;
+    }
+
+    /**
+     * Poisons this worker.
+     */
+    public function poison() {
+        cli_writeln("Poisoned worker.");
+        exit(1);
     }
 }

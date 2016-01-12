@@ -35,6 +35,10 @@ use Pheanstalk\PheanstalkInterface;
  */
 class beanstalk
 {
+    const STATUS_OK = 0;
+    const STATUS_ERROR = 1;
+    const STATUS_RETRY = 2;
+
     private $config;
     private $enabled;
     private $api;
@@ -127,6 +131,8 @@ class beanstalk
 
         $this->watch($this->get_tube());
         while ($job = $this->reserve()) {
+            $jobs++;
+
             // Check the DB is still alive.
             try {
                 $currentversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
@@ -156,16 +162,30 @@ class beanstalk
             // Run!
             try {
                 $obj = new $class();
-                if (!call_user_func_array(array($obj, $received['method']), $args)) {
+                $ret = call_user_func_array(array($obj, $received['method']), $args);
+                if ($ret === false) {
                     cli_writeln("Invalid class: " . json_encode($received));
+                } else {
+                    switch ($ret) {
+                        case self::STATUS_RETRY:
+                            // The user function is telling us to retry.
+                            $this->release($job);
+                        break;
+
+                        case self::STATUS_ERROR:
+                            cli_writeln("Job threw handled error");
+                        case self::STATUS_OK:
+                        default:
+                            $this->delete($job);
+                        break;
+                    }
                 }
             } catch (\Exception $e) {
-                cli_writeln("Exception thrown: " . $e->getMessage());
+                print_r($received);
+                cli_writeln("Exception thrown in user function: " . $e->getMessage());
+                $this->delete($job);
             }
 
-            $this->delete($job);
-
-            $jobs++;
             if ($jobs > 15) {
                 exit(1);
             }
