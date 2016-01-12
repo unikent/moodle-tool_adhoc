@@ -38,6 +38,7 @@ class beanstalk
     const STATUS_OK = 0;
     const STATUS_ERROR = 1;
     const STATUS_RETRY = 2;
+    const STATUS_BURY = 4;
 
     private $config;
     private $enabled;
@@ -177,6 +178,11 @@ class beanstalk
                         case self::STATUS_RETRY:
                             // The user function is telling us to retry.
                             $this->release($job);
+                        break;
+
+                        case self::STATUS_BURY:
+                            // The user function is telling us to bury.
+                            $this->bury($job);
                         break;
 
                         case self::STATUS_ERROR:
