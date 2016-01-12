@@ -33,7 +33,9 @@ class beanstalk extends \local_nagios\base_check
     public function execute() {
         try {
             $beanstalk = new \tool_adhoc\beanstalk();
-            if (!$beanstalk->getConnection()->isServiceListening()) {
+            if (!$beanstalk->is_ready()) {
+                $this->error('Beanstalk isn\'t working!');
+            } else if (!$beanstalk->getConnection()->isServiceListening()) {
                 $this->error('Beanstalk isn\'t listening to me!');
             } else {
                 $info = $beanstalk->statsTube($beanstalk->get_tube());
