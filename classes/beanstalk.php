@@ -116,12 +116,28 @@ class beanstalk
      * Initialize worker.
      */
     public function become_worker() {
+        global $DB;
+
         if (!$this->enabled) {
             return false;
         }
 
+        $runversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
+
         $this->watch($this->get_tube());
         while ($job = $this->reserve()) {
+            // Check the DB is still alive.
+            try {
+                $currentversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
+
+                if ($currentversion !== $runversion) {
+                    throw new \moodle_exception("Beanstalk worker requires a restart.");
+                }
+            } catch (\Exception $e) {
+                $this->release($job);
+                exit(1);
+            }
+
             $received = json_decode($job->getData(), true);
 
             // Structure check.
