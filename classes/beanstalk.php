@@ -90,6 +90,13 @@ class beanstalk
     }
 
     /**
+     * Are we ready?
+     */
+    public function is_ready() {
+        return $this->enabled;
+    }
+
+    /**
      * Return our tube name.
      */
     public function get_tube() {
@@ -193,10 +200,19 @@ class beanstalk
     }
 
     /**
+     * Hook for custom tasks.
+     */
+    public static function queue_custom_task($class, $method, $args = array(), $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
+        $beanstalk = new static();
+        if ($beanstalk->is_ready()) {
+            $beanstalk->add_job($class, $method, $args, 900, $priority);
+        }
+    }
+
+    /**
      * Hook for queue_adhoc_task.
      */
     public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
-        $beanstalk = new static();
-        $beanstalk->add_job('\\tool_adhoc\\jobs\\adhoc', 'run_task', array($id), 900, $priority);
+        static::queue_custom_task('\\tool_adhoc\\jobs\\adhoc', 'run_task', array($id), $priority);
     }
 }
