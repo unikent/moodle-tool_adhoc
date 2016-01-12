@@ -35,6 +35,10 @@ use Pheanstalk\PheanstalkInterface;
  */
 class beanstalk
 {
+    const STATUS_OK = 0;
+    const STATUS_ERROR = 1;
+    const STATUS_RETRY = 2;
+
     private $config;
     private $enabled;
     private $api;
@@ -116,37 +120,75 @@ class beanstalk
      * Initialize worker.
      */
     public function become_worker() {
+        global $DB;
+
         if (!$this->enabled) {
             return false;
         }
 
+        $jobs = 0;
+        $runversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
+
         $this->watch($this->get_tube());
         while ($job = $this->reserve()) {
+            $jobs++;
+
+            // Check the DB is still alive.
+            try {
+                $currentversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
+
+                if ($currentversion !== $runversion) {
+                    throw new \moodle_exception("Beanstalk worker requires a restart.");
+                }
+            } catch (\Exception $e) {
+                $this->release($job);
+                exit(1);
+            }
+
             $received = json_decode($job->getData(), true);
 
             // Structure check.
-            if (!is_array($received) || !isset($recieved['class']) || !isset($recieved['method'])) {
-                cli_writeln("Recieved invalid job: " . json_encode($received));
+            if (!is_array($received) || !isset($received['class']) || !isset($received['method'])) {
+                cli_writeln("Received invalid job: " . json_encode($received));
                 $this->delete($job);
 
                 continue;
             }
 
             // We have something to do!
-            $args = isset($recieved['args']) ? $recieved['args'] : array();
-            $class = $recieved['class'];
+            $args = isset($received['args']) ? $received['args'] : array();
+            $class = $received['class'];
 
             // Run!
             try {
                 $obj = new $class();
-                if (!call_user_method(array($obj, $recieved['method']), $args)) {
+                $ret = call_user_func_array(array($obj, $received['method']), $args);
+                if ($ret === false) {
                     cli_writeln("Invalid class: " . json_encode($received));
+                } else {
+                    switch ($ret) {
+                        case self::STATUS_RETRY:
+                            // The user function is telling us to retry.
+                            $this->release($job);
+                        break;
+
+                        case self::STATUS_ERROR:
+                            cli_writeln("Job threw handled error");
+                        case self::STATUS_OK:
+                        default:
+                            $this->delete($job);
+                        break;
+                    }
                 }
             } catch (\Exception $e) {
-                cli_writeln("Exception thrown: " . $e->getMessage());
+                print_r($received);
+                cli_writeln("Exception thrown in user function: " . $e->getMessage());
+                $this->delete($job);
             }
 
-            $this->delete($job);
+            if ($jobs > 15) {
+                exit(1);
+            }
         }
     }
 
@@ -155,6 +197,6 @@ class beanstalk
      */
     public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
         $beanstalk = new static();
-        $beanstalk->add_job("\\tool_adhoc\\jobs\\adhoc", 'run_task', array($id), 900, $priority);
+        $beanstalk->add_job('\\tool_adhoc\\jobs\\adhoc', 'run_task', array($id), 900, $priority);
     }
 }
