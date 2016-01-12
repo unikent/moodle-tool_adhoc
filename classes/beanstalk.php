@@ -122,6 +122,7 @@ class beanstalk
             return false;
         }
 
+        $jobs = 0;
         $runversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
 
         $this->watch($this->get_tube());
@@ -163,6 +164,11 @@ class beanstalk
             }
 
             $this->delete($job);
+
+            $jobs++;
+            if ($jobs > 15) {
+                exit(1);
+            }
         }
     }
 
