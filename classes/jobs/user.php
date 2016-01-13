@@ -34,7 +34,19 @@ class user
      * Pre-populate caches a user might be interested in.
      */
     public function on_login($userid) {
+        global $CFG;
 
+        require_once("{$CFG->libdir}/enrollib.php");
+
+        cli_writeln("Processing user login: {$userid}");
+
+        // Grab a ist of courses they're in.
+        $courses = enrol_get_users_courses($userid);
+        foreach ($courses as $course) {
+            cli_writeln("Pre-caching course: " . $course->id);
+            //get_fast_modinfo();
+            \course_modinfo::build_course_cache($course);
+        }
 
         return \tool_adhoc\beanstalk::STATUS_OK;
     }
@@ -43,7 +55,7 @@ class user
      * Pre-populate caches a user might be interested in.
      */
     public function on_logout($userid) {
-
+        cli_writeln("Processing user logout: {$userid}");
 
         return \tool_adhoc\beanstalk::STATUS_OK;
     }
