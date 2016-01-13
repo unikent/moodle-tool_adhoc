@@ -38,6 +38,7 @@ class beanstalk
     const STATUS_OK = 0;
     const STATUS_ERROR = 1;
     const STATUS_RETRY = 2;
+    const STATUS_BURY = 4;
 
     private $config;
     private $enabled;
@@ -87,6 +88,13 @@ class beanstalk
         }
 
         return $result;
+    }
+
+    /**
+     * Are we ready?
+     */
+    public function is_ready() {
+        return $this->enabled;
     }
 
     /**
@@ -172,6 +180,11 @@ class beanstalk
                             $this->release($job);
                         break;
 
+                        case self::STATUS_BURY:
+                            // The user function is telling us to bury.
+                            $this->bury($job);
+                        break;
+
                         case self::STATUS_ERROR:
                             cli_writeln("Job threw handled error");
                         case self::STATUS_OK:
@@ -186,6 +199,10 @@ class beanstalk
                 $this->delete($job);
             }
 
+            // Flush buffers.
+            $this->flush();
+
+            // Can we go now?
             if ($jobs > 15) {
                 exit(1);
             }
@@ -193,10 +210,38 @@ class beanstalk
     }
 
     /**
+     * Flushes various buffers.
+     */
+    private function flush() {
+        // Flush log stores.
+        get_log_manager(true);
+
+        // Special case for splunk.
+        $splunk = \logstore_splunk\splunk::instance();
+        $splunk->flush();
+    }
+
+    /**
+     * Hook for custom tasks.
+     */
+    public static function queue_custom_task($class, $method, $args = array(), $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
+        $beanstalk = new static();
+        if ($beanstalk->is_ready()) {
+            $beanstalk->add_job($class, $method, $args, 900, $priority);
+        }
+    }
+
+    /**
      * Hook for queue_adhoc_task.
      */
     public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
-        $beanstalk = new static();
-        $beanstalk->add_job('\\tool_adhoc\\jobs\\adhoc', 'run_task', array($id), 900, $priority);
+        static::queue_custom_task('\\tool_adhoc\\jobs\\adhoc', 'run_task', array($id), $priority);
+    }
+
+    /**
+     * Hook for kick.
+     */
+    public static function kick_workers() {
+        static::queue_custom_task('\\tool_adhoc\\jobs\\utility', 'kick', array(microtime(true)));
     }
 }
