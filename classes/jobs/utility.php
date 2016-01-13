@@ -33,8 +33,9 @@ class utility
     /**
      * Run an adhoc task.
      */
-    public function kick() {
-        cli_writeln("Kicked worker.");
+    public function kick($microtime) {
+        $time = microtime(true) - $microtime;
+        cli_writeln("Kicked worker in {$time}ms.");
 
         return \tool_adhoc\beanstalk::STATUS_OK;
     }

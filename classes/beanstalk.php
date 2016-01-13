@@ -221,4 +221,11 @@ class beanstalk
     public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
         static::queue_custom_task('\\tool_adhoc\\jobs\\adhoc', 'run_task', array($id), $priority);
     }
+
+    /**
+     * Hook for kick.
+     */
+    public static function kick_workers() {
+        static::queue_custom_task('\\tool_adhoc\\jobs\\utility', 'kick', array(microtime(true)));
+    }
 }
