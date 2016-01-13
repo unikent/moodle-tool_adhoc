@@ -199,10 +199,26 @@ class beanstalk
                 $this->delete($job);
             }
 
+            // Flush buffers.
+            $this->flush();
+
+            // Can we go now?
             if ($jobs > 15) {
                 exit(1);
             }
         }
+    }
+
+    /**
+     * Flushes various buffers.
+     */
+    private function flush() {
+        // Flush log stores.
+        get_log_manager(true);
+
+        // Special case for splunk.
+        $splunk = \logstore_splunk\splunk::instance();
+        $splunk->flush();
     }
 
     /**
