@@ -29,8 +29,7 @@ require_once("{$CFG->libdir}/clilib.php");
 require_once("{$CFG->libdir}/cronlib.php");
 
 if (moodle_needs_upgrading()) {
-    mtrace("Moodle upgrade pending, cannot execute tasks.");
-    exit(1);
+    cli_error("Moodle upgrade pending, cannot execute tasks.");
 }
 
 list($options, $unrecognized) = cli_get_params(
@@ -57,7 +56,7 @@ Example:
 
 ";
 
-    echo $help;
+    cli_write($help);
     die;
 }
 
@@ -66,11 +65,11 @@ if ($options['list']) {
 
     $shorttime = get_string('strftimedatetimeshort');
 
-    echo str_pad('ID', 6, ' ') . ' ' . str_pad('Class Name', 150, ' ') . "\n";
+    cli_writeln(str_pad('ID', 6, ' ') . ' ' . str_pad('Class Name', 150, ' '));
 
     $tasks = $DB->get_records('task_adhoc');
     foreach ($tasks as $task) {
-        echo str_pad($task->id, 6, ' ') . ' ' . str_pad($task->classname, 150, ' ') . "\n";
+        cli_writeln(str_pad($task->id, 6, ' ') . ' ' . str_pad($task->classname, 150, ' '));
     }
 
     exit(0);
@@ -103,7 +102,7 @@ if (!empty($options['delete'])) {
     ));
 
     if (!$record) {
-        mtrace("Task '{$delete}' not found.");
+        cli_problem("Task '{$delete}' not found.");
         exit(1);
     }
 
@@ -111,5 +110,5 @@ if (!empty($options['delete'])) {
         'id' => $delete
     ));
 
-    mtrace("Task '{$delete}' deleted.");
+    cli_writeln("Task '{$delete}' deleted.");
 }

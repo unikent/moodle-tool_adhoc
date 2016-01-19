@@ -40,7 +40,9 @@ class manager
      * @return bool True if we succeeded, false if we didnt.
      */
     public static function run_tasks($records, $failonblock = false) {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once("{$CFG->libdir}/clilib.php");
 
         // Get the cron lock factory.
         $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
@@ -50,7 +52,7 @@ class manager
             // Grab the task.
             $task = \core\task\manager::adhoc_task_from_record($record);
             if (!$task) {
-                mtrace("Task '{$record->id}' could not be loaded.");
+                cli_problem("Task '{$record->id}' could not be loaded.");
                 continue;
             }
 
@@ -65,7 +67,7 @@ class manager
             try {
                 // Grab a task lock.
                 if (!$lock = $cronlockfactory->get_lock('adhoc_' . $record->id, 10)) {
-                    mtrace('Cannot obtain task lock');
+                    cli_problem('Cannot obtain task lock');
                     continue;
                 }
 
@@ -73,7 +75,7 @@ class manager
                 $task->set_lock($lock);
                 if ($task->is_blocking()) {
                     if (!$cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
-                        mtrace('Cannot obtain cron lock');
+                        cli_problem('Cannot obtain cron lock');
                         continue;
                     }
                     $task->set_cron_lock($cronlock);
@@ -84,10 +86,10 @@ class manager
 
                 // Echo out performance info.
                 if (isset($predbqueries)) {
-                    mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-                    mtrace("... used " . (microtime(1) - $pretime) . " seconds");
+                    cli_writeln("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
+                    cli_writeln("... used " . (microtime(1) - $pretime) . " seconds");
                 }
-                mtrace("Task {$record->id} completed.");
+                cli_writeln("Task {$record->id} completed.");
 
                 // Set the task as complete.
                 \core\task\manager::adhoc_task_complete($task);
@@ -96,9 +98,9 @@ class manager
                     $DB->force_transaction_rollback();
                 }
 
-                mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-                mtrace("... used " . (microtime(true) - $pretime) . " seconds");
-                mtrace("Task failed: " . $e->getMessage());
+                cli_writeln("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
+                cli_writeln("... used " . (microtime(true) - $pretime) . " seconds");
+                cli_problem("Task failed: " . $e->getMessage());
 
                 // We failed.
                 \core\task\manager::adhoc_task_failed($task);
