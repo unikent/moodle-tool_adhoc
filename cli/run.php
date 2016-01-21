@@ -29,8 +29,7 @@ require_once("{$CFG->libdir}/clilib.php");
 require_once("{$CFG->libdir}/cronlib.php");
 
 if (moodle_needs_upgrading()) {
-    mtrace("Moodle upgrade pending, cannot execute tasks.");
-    exit(1);
+    cli_error("Moodle upgrade pending, cannot execute tasks.");
 }
 
 // Increase memory limit.
@@ -42,8 +41,8 @@ cron_setup_user();
 // Run all tasks.
 $tasks = $DB->get_records('task_adhoc');
 if (!empty($tasks)) {
-    mtrace("Running " . count($tasks) . " tasks.");
+    cli_writeln("Running " . count($tasks) . " tasks.");
     \tool_adhoc\manager::run_tasks($tasks);
 } else {
-    mtrace("No tasks to run!");
+    cli_writeln("No tasks to run!");
 }
