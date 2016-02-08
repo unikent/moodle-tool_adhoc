@@ -61,7 +61,11 @@ class beanstalk
 
         try {
             if ($this->enabled) {
-                $this->api = new Pheanstalk($this->config->beanstalk_hostname, $this->config->beanstalk_port, $this->config->beanstalk_timeout);
+                $this->api = new Pheanstalk(
+                    $this->config->beanstalk_hostname,
+                    $this->config->beanstalk_port,
+                    $this->config->beanstalk_timeout
+                );
             }
         } catch (\Exception $e) {
             // Not ready?
@@ -138,7 +142,7 @@ class beanstalk
         $runversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
 
         $this->watch($this->get_tube());
-        while ($job = $this->reserve()) {
+        while ($job = $this->reserve(300)) {
             $jobs++;
 
             // Check the DB is still alive.
