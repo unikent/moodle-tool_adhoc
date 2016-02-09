@@ -33,7 +33,7 @@ if (moodle_needs_upgrading()) {
 }
 
 list($options, $unrecognized) = cli_get_params(
-    array('help' => false, 'list' => false, 'execute' => false, 'delete' => false),
+    array('help' => false, 'list' => false, 'execute' => false, 'delete' => false, 'runall' => false),
     array('h' => 'help')
 );
 
@@ -42,22 +42,44 @@ if ($unrecognized) {
     cli_error(get_string('cliunknowoption', 'admin', $unrecognized));
 }
 
-if ($options['help'] or (!$options['list'] and !$options['execute'] and !$options['delete'])) {
+if ($options['help'] || (!$options['list'] && !$options['execute'] && !$options['delete'] && !$options['runall'])) {
     $help = "Adhoc cron tasks.
 
 Options:
+--runall      Run all adhoc tasks
 --execute=id  Execute adhoc task manually
 --delete=id   Delete adhoc task manually
 --list        List all adhoc tasks
 -h, --help    Print out this help
 
 Example:
-\$sudo -u www-data /usr/bin/php admin/tool/adhoc/cli/run_adhoc_task.php --execute=1
+\$sudo -u w3moodle /usr/bin/php admin/tool/adhoc/cli/run_adhoc_task.php --runall
 
 ";
 
     cli_write($help);
     die;
+}
+
+if ($options['runall'] || !empty($options['execute'])) {
+    // Increase memory limit.
+    raise_memory_limit(MEMORY_EXTRA);
+
+    // Emulate normal session - we use admin account by default.
+    cron_setup_user();
+}
+
+if ($options['runall']) {
+    // Run all tasks.
+    $tasks = $DB->get_records('task_adhoc');
+    if (!empty($tasks)) {
+        cli_writeln("Running " . count($tasks) . " tasks.");
+        \tool_adhoc\manager::run_tasks($tasks);
+    } else {
+        cli_writeln("No tasks to run!");
+    }
+
+    exit(0);
 }
 
 if ($options['list']) {
@@ -77,12 +99,6 @@ if ($options['list']) {
 
 if (!empty($options['execute'])) {
     $execute = $options['execute'];
-
-    // Increase memory limit.
-    raise_memory_limit(MEMORY_EXTRA);
-
-    // Emulate normal session - we use admin account by default.
-    cron_setup_user();
 
     // Get the record.
     $record = $DB->get_record('task_adhoc', array(
