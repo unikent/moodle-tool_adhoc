@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Run all adhoc tasks.
+ * Run an adhoc task.
  *
  * @package    tool_adhoc
- * @copyright  2015 University of Kent
+ * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,6 +32,33 @@ if (moodle_needs_upgrading()) {
     cli_error("Moodle upgrade pending, cannot execute tasks.");
 }
 
+list($options, $unrecognized) = cli_get_params(
+    array('help' => false, 'data' => false, 'class' => false),
+    array('h' => 'help')
+);
+
+if ($unrecognized) {
+    $unrecognized = implode("\n  ", $unrecognized);
+    cli_error(get_string('cliunknowoption', 'admin', $unrecognized));
+}
+
+if ($options['help'] || (!$options['data'] && !$options['class'])) {
+    $help = "Adhoc cron tasks.
+
+Options:
+--class=classname  Run all adhoc tasks
+--data=JSON        JSON data
+-h, --help         Print out this help
+
+Example:
+\$sudo -u w3moodle /usr/bin/php admin/tool/adhoc/cli/run_adhoc_task.php --runall
+
+";
+
+    cli_write($help);
+    die;
+}
+
 // Increase memory limit.
 raise_memory_limit(MEMORY_EXTRA);
 
@@ -39,10 +66,9 @@ raise_memory_limit(MEMORY_EXTRA);
 cron_setup_user();
 
 // Run all tasks.
-$tasks = $DB->get_records('task_adhoc');
-if (!empty($tasks)) {
-    cli_writeln("Running " . count($tasks) . " tasks.");
-    \tool_adhoc\manager::run_tasks($tasks);
-} else {
-    cli_writeln("No tasks to run!");
+$class = $options['class'];
+$obj = new $class();
+if (!empty($options['data'])) {
+    $obj->set_custom_data(json_decode($options['data']));
 }
+$obj->execute();
