@@ -138,13 +138,10 @@ class beanstalk
             return false;
         }
 
-        $jobs = 0;
         $runversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
 
         $this->watch($this->get_tube());
         while ($job = $this->reserve(300)) {
-            $jobs++;
-
             // Check the DB is still alive.
             try {
                 $currentversion = $DB->get_field('config', 'value', array('name' => 'beanstalk_deploy'));
@@ -205,11 +202,6 @@ class beanstalk
 
             // Flush buffers.
             $this->flush();
-
-            // Can we go now?
-            if ($jobs > 15) {
-                exit(1);
-            }
         }
     }
 
