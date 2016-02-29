@@ -55,10 +55,6 @@ class beanstalk extends \local_nagios\base_check
                         $this->warning($info['current-jobs-buried'] . ' buried jobs in Beanstalk.');
                     }
                 }
-
-                $this->set_perf_var('beanstalk_jobs_waiting', $info['current-jobs-ready']);
-                $this->set_perf_var('beanstalk_jobs_reserved', $info['current-jobs-reserved']);
-                $this->set_perf_var('beanstalk_jobs_buried', $info['current-jobs-buried']);
             }
         } catch (\Exception $e) {
             $this->error('Could not connect to Beanstalk!');
