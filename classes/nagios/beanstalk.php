@@ -36,12 +36,12 @@ class beanstalk extends \local_nagios\base_check
             if (!$beanstalk->is_ready()) {
                 $this->error('Beanstalk isn\'t working!');
             } else if (!$beanstalk->getConnection()->isServiceListening()) {
-                $this->error('Beanstalk isn\'t listening to me!');
+                $this->error('Beanstalk isn\'t listening!');
             } else {
                 $info = $beanstalk->statsTube($beanstalk->get_tube());
 
-                if ($info['current-watching'] <= 5) {
-                    $this->error('Less than 5 Beanstalk workers found! (found ' . $info['current-watching'] . ')');
+                if ($info['current-watching'] <= 1) {
+                    $this->error('No Beanstalk workers found! (found ' . $info['current-watching'] . ')');
                 } else {
                     if ($info['current-jobs-ready'] > 50) {
                         $this->warning($info['current-jobs-ready'] . ' jobs queued in Beanstalk.');
