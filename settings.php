@@ -31,7 +31,7 @@ if ($hassiteconfig) {
         new \moodle_url("/admin/tool/adhoc/index.php")
     ));
 
-    $ADMIN->add('tools', new admin_externalpage(
+    $ADMIN->add('reports', new admin_externalpage(
         'beanstalktaskstats',
         'Beanstalk stats',
         new \moodle_url("/admin/tool/adhoc/beanstalk.php")
