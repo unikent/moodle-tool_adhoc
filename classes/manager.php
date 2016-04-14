@@ -40,6 +40,19 @@ class manager
     const STATUS_RETRY = 2;
 
     /**
+     * Check a plugin is enabled.
+     */
+    public static function is_enabled($plugin) {
+        $enabled = get_config('tool_adhoc', 'enabled_queues');
+        if ($enabled) {
+            $enabled = array_flip(explode(',', $enabled));
+            return in_array("queue_{$plugin}", $enabled);
+        }
+
+        return false;
+    }
+
+    /**
      * Hook for queue_adhoc_task.
      */
     public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
