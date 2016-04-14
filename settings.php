@@ -26,9 +26,20 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) {
-    $ADMIN->add('tools', new admin_externalpage(
-        'adhoctaskmanager',
-        get_string('pluginname', 'tool_adhoc'),
-        new \moodle_url("/admin/tool/adhoc/index.php")
+    $ADMIN->add('modules', new admin_category('queues', new lang_string('subplugintype_queue_plural', 'tool_adhoc')));
+
+    $temp = new admin_settingpage('managequeues', new lang_string('managequeues', 'tool_adhoc'));
+    $temp->add(new tool_adhoc_setting_managequeues());
+    $ADMIN->add('queues', $temp);
+
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('queue') as $plugin) {
+        /** @var \tool_adhoc\plugininfo\queue $plugin */
+        $plugin->load_settings($ADMIN, 'queues', $hassiteconfig);
+    }
+
+    $ADMIN->add('reports', new admin_externalpage(
+        'adhoctaskmanagerreport',
+        get_string('adhoctasks', 'tool_adhoc'),
+        new \moodle_url("/admin/tool/adhoc/report.php")
     ));
 }
