@@ -18,6 +18,7 @@
  * Run an adhoc task.
  *
  * @package    tool_adhoc
+ * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
  * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

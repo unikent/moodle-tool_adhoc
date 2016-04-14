@@ -1,0 +1,4 @@
+[submodule "queue/beanstalk"]
+	path = queue/beanstalk
+	url = git@gitlab-pilot.kent.ac.uk:moodle/moodle-queue_beanstalk.git
+	branch = master

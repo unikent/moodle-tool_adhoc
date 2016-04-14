@@ -18,7 +18,8 @@
  * Main API for the adhoc task manager.
  *
  * @package    tool_adhoc
- * @copyright  2015 University of Kent
+ * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +29,8 @@ namespace tool_adhoc;
  * Adhoc manager methods.
  *
  * @package   tool_adhoc
- * @copyright 2016 University of Kent
+ * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 University of Kent
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager
