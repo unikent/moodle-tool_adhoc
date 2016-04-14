@@ -35,10 +35,6 @@ namespace tool_adhoc;
  */
 class manager
 {
-    const STATUS_OK = 0;
-    const STATUS_ERROR = 1;
-    const STATUS_RETRY = 2;
-
     /**
      * Returns all queues in order.
      */

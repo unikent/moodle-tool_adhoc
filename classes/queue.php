@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Main API for the adhoc task manager.
  *
  * @package    tool_adhoc
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -23,10 +23,33 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace tool_adhoc;
 
-$plugin->component = 'tool_adhoc';
-$plugin->version   = 2016041300;
-$plugin->requires  = 2014051200;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '2.0 (Build: 2016041300)';
+/**
+ * Interface for queue managers.
+ *
+ * @package   tool_adhoc
+ * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 University of Kent
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+interface queue
+{
+    /**
+     * Push an item onto the queue.
+     *
+     * @param  int $id       ID of the adhoc task.
+     * @param  int $priority Priority (higher = lower priority)
+     * @param  int $timeout  Timeout for the task to complete.
+     * @param  int $delay    Delay before executing task.
+     * @return bool          True on success, false otherwise.
+     */
+    public function push($id, $priority = 512, $timeout = 900, $delay = 0);
+
+    /**
+     * Are we ready?
+     *
+     * @return bool True if ready, false otherwise.
+     */
+    public function is_ready();
+}
