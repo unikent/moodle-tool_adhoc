@@ -35,11 +35,15 @@ namespace tool_adhoc;
  */
 class manager
 {
+    const STATUS_OK = 0;
+    const STATUS_ERROR = 1;
+    const STATUS_RETRY = 2;
+
     /**
      * Hook for queue_adhoc_task.
      */
     public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
-        \tool_adhoc\beanstalk::queue_adhoc_task($id, $priority);
+        \queue_beanstalk\manager::queue_adhoc_task($id, $priority);
     }
 
     /**

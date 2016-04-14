@@ -31,10 +31,4 @@ if ($hassiteconfig) {
         get_string('pluginname', 'tool_adhoc'),
         new \moodle_url("/admin/tool/adhoc/index.php")
     ));
-
-    $ADMIN->add('reports', new admin_externalpage(
-        'beanstalktaskstats',
-        'Beanstalk stats',
-        new \moodle_url("/admin/tool/adhoc/beanstalk.php")
-    ));
 }

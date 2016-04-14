@@ -25,10 +25,10 @@
 
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 admin_externalpage_setup('adhoctaskmanager');
 
-$renderer = $PAGE->get_renderer('tool_adhoc');
 $action = optional_param('action', '', PARAM_ALPHA);
 $task = optional_param('task', '', PARAM_INT);
 
@@ -105,9 +105,71 @@ echo $OUTPUT->heading(get_string('pluginname', 'tool_adhoc'));
 $tasks = $DB->get_records('task_adhoc');
 
 if (empty($tasks)) {
-    echo $renderer->empty_list();
+    echo \html_writer::tag('p', get_string('notasks', 'tool_adhoc'));
 } else {
-    echo $renderer->adhoc_tasks_table($tasks);
+    $columns = array(
+        'id' => get_string('id', 'tool_adhoc'),
+        'component' => get_string('component', 'tool_task'),
+        'delete' => get_string('delete'),
+        'run' => get_string('run', 'tool_adhoc'),
+        'name' => get_string('name'),
+        'nextruntime' => get_string('nextruntime', 'tool_task'),
+        'faildelay' => get_string('faildelay', 'tool_task'),
+        'customdata' => get_string('customdata', 'tool_adhoc'),
+        'blocking' => get_string('blocking', 'tool_adhoc')
+    );
+
+    $table = new \flexible_table('adhoctaskinfo');
+    $table->set_attribute('class', 'table flexible');
+    $table->define_columns(array_keys($columns));
+    $table->define_headers(array_values($columns));
+    $table->define_baseurl($PAGE->url);
+    $table->setup();
+    $info = $beanstalk->statsTube($beanstalk->get_tube());
+    foreach ($tasks as $task) {
+        $configureurl = new moodle_url('/admin/tool/adhoc/index.php', array(
+            'action' => 'delete',
+            'task' => $task->id,
+            'sesskey' => sesskey()
+        ));
+
+        $editlink = $OUTPUT->action_icon($configureurl, new pix_icon('t/delete', get_string('deletetask', 'tool_adhoc')));
+
+        $runurl = new moodle_url('/admin/tool/adhoc/index.php', array(
+            'action' => 'run',
+            'task' => $task->id,
+            'sesskey' => sesskey()
+        ));
+
+        $runlink = $OUTPUT->action_icon($runurl, new pix_icon('t/go', get_string('runtask', 'tool_adhoc')));
+
+        $component = $task->component;
+        list($type, $plugin) = core_component::normalize_component($component);
+        if ($type === 'core') {
+            $componentcell = get_string('corecomponent', 'tool_task');
+        } else {
+            if ($plugininfo = core_plugin_manager::instance()->get_plugin_info($component)) {
+                $plugininfo->init_display_name();
+                $componentcell = $plugininfo->displayname;
+            } else {
+                $componentcell = $component;
+            }
+        }
+
+        $table->add_data(array(
+            $task->id,
+            $componentcell,
+            $editlink,
+            $runlink,
+            $task->classname,
+            $task->nextruntime,
+            $task->faildelay,
+            $task->customdata,
+            $task->blocking
+        ));
+    }
+
+    $table->finish_output();
 }
 
 echo $OUTPUT->footer();

@@ -47,12 +47,12 @@ if ($options['help'] || (!$options['data'] && !$options['class'])) {
     $help = "Adhoc cron tasks.
 
 Options:
---class=classname  Run all adhoc tasks
+--class=classname  Run an adhoc task of this classname
 --data=JSON        JSON data
 -h, --help         Print out this help
 
 Example:
-\$sudo -u w3moodle /usr/bin/php admin/tool/adhoc/cli/run_adhoc_task.php --runall
+\$/usr/bin/php admin/tool/adhoc/cli/run.php --class=\classname\task\adhoc
 
 ";
 

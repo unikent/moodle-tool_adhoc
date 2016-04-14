@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Beanstalk jobs.
+ * Utility jobs.
  *
  * @package    tool_adhoc
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -41,6 +41,24 @@ class adhoc
             \tool_adhoc\manager::run_tasks(array($task), true);
         }
 
-        return \tool_adhoc\beanstalk::STATUS_OK;
+        return \tool_adhoc\manager::STATUS_OK;
+    }
+
+    /**
+     * Kick a worker.
+     */
+    public function kick($microtime) {
+        $time = microtime(true) - $microtime;
+        cli_writeln("Kicked worker in {$time}ms.");
+
+        return \tool_adhoc\manager::STATUS_OK;
+    }
+
+    /**
+     * Poisons this worker.
+     */
+    public function poison() {
+        cli_writeln("Poisoned worker.");
+        exit(1);
     }
 }
