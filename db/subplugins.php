@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Nagios definitions for tool_adhoc.
- * Only works if local_nagios is installed, otherwise does nothing.
+ * Adhoc task tool.
  *
  * @package    tool_adhoc
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -24,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$nagios = array(
-    array(
-        'classname' => 'tool_adhoc\nagios\beanstalk'
-    )
+$subplugins = array(
+    'queue' => 'admin/tool/adhoc/queue'
 );

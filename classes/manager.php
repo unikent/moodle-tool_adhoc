@@ -34,6 +34,13 @@ namespace tool_adhoc;
 class manager
 {
     /**
+     * Hook for queue_adhoc_task.
+     */
+    public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
+        \tool_adhoc\beanstalk::queue_adhoc_task($id, $priority);
+    }
+
+    /**
      * Run a given set of tasks.
      *
      * @param array $records An array of adhoc DB records to run.
