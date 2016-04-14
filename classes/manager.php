@@ -40,23 +40,46 @@ class manager
     const STATUS_RETRY = 2;
 
     /**
+     * Returns all queues in order.
+     */
+    public static function get_queues() {
+        $enabled = get_config('tool_adhoc', 'enabled_queues');
+        if (!$enabled) {
+            return array();
+        }
+
+        $plugins = array_flip(explode(',', $enabled));
+        return array_map(function($plugin) {
+            $class = "$plugin\\manager";
+            return new $class();
+        }, $plugins);
+    }
+
+    /**
      * Check a plugin is enabled.
      */
     public static function is_enabled($plugin) {
         $enabled = get_config('tool_adhoc', 'enabled_queues');
-        if ($enabled) {
-            $enabled = array_flip(explode(',', $enabled));
-            return in_array("queue_{$plugin}", $enabled);
+        if (!$enabled) {
+            return false;
         }
 
-        return false;
+        $enabled = explode(',', $enabled);
+        return in_array("queue_{$plugin}", $enabled);
     }
 
     /**
      * Hook for queue_adhoc_task.
      */
-    public static function queue_adhoc_task($id, $priority = PheanstalkInterface::DEFAULT_PRIORITY) {
-        \queue_beanstalk\manager::queue_adhoc_task($id, $priority);
+    public static function queue_adhoc_task($id, $priority = 1024) {
+        $queues = self::get_queues();
+        foreach ($queues as $queue) {
+            if ($queue->is_ready()) {
+                return $queue->push($id, $priority);
+            }
+        }
+
+        return false;
     }
 
     /**
