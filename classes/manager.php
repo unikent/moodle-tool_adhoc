@@ -44,9 +44,9 @@ class manager
             return array();
         }
 
-        $plugins = array_flip(explode(',', $enabled));
+        $plugins = explode(',', $enabled);
         return array_map(function($plugin) {
-            $class = "$plugin\\manager";
+            $class = "\\$plugin\\manager";
             return new $class();
         }, $plugins);
     }
@@ -84,7 +84,7 @@ class manager
      * @param array $records An array of adhoc DB records to run.
      * @return bool True if we succeeded, false if we didnt.
      */
-    public static function run_tasks($records, $failonblock = false) {
+    public static function run_tasks($records, $ignoreblocking = false) {
         global $CFG, $DB;
 
         require_once("{$CFG->libdir}/clilib.php");
@@ -101,7 +101,7 @@ class manager
                 continue;
             }
 
-            if ($failonblock && $task->is_blocking()) {
+            if ($ignoreblocking && $task->is_blocking()) {
                 continue;
             }
 
