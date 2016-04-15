@@ -1,8 +1,10 @@
 Adhoc Queue Systems
 ===
 
-This subplugin directory can contain additional queuing systems for adhoc tasks, such
-as beanstalk and redis.
+This is for advanced users only!
+
+This subplugin directory can contain additional queuing systems for adhoc tasks, such as beanstalk and redis.
+The cron system will still run in the background as a backup unless you disable that.
 
 It relies on a core hack (don't all of my plugins?!), you need to change this function in '/lib/classes/task/manager.php':
 ```
@@ -14,3 +16,6 @@ public static function queue_adhoc_task(adhoc_task $task) {
     return $result;
 }
 ```
+
+All plugins should implement "\tool_adhoc\queue" and must have a class "manager".
+See https://github.com/unikent/moodle-queue_beanstalk for an example implementation.
