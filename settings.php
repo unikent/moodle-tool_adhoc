@@ -40,6 +40,6 @@ if ($hassiteconfig) {
     $ADMIN->add('reports', new admin_externalpage(
         'adhoctaskmanagerreport',
         get_string('adhoctasks', 'tool_adhoc'),
-        new \moodle_url("/admin/tool/adhoc/report.php")
+        new \moodle_url("/admin/tool/adhoc/index.php")
     ));
 }
