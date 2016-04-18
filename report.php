@@ -125,7 +125,6 @@ if (empty($tasks)) {
     $table->define_headers(array_values($columns));
     $table->define_baseurl($PAGE->url);
     $table->setup();
-    $info = $beanstalk->statsTube($beanstalk->get_tube());
     foreach ($tasks as $task) {
         $configureurl = new moodle_url('/admin/tool/adhoc/report.php', array(
             'action' => 'delete',
