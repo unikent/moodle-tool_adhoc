@@ -86,8 +86,6 @@ if ($options['runall']) {
 if ($options['list']) {
     cli_heading("List of adhoc tasks ({$CFG->wwwroot})");
 
-    $shorttime = get_string('strftimedatetimeshort');
-
     cli_writeln(str_pad('ID', 6, ' ') . ' ' . str_pad('Class Name', 150, ' '));
 
     $tasks = $DB->get_records('task_adhoc');
