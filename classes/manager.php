@@ -67,11 +67,11 @@ class manager
     /**
      * Hook for queue_adhoc_task.
      */
-    public static function queue_adhoc_task($id, $priority = 1024) {
+    public static function queue_adhoc_task($id, $priority = 512, $timeout = 900, $delay = 0) {
         $queues = self::get_queues();
         foreach ($queues as $queue) {
             if ($queue->is_ready()) {
-                return $queue->push($id, $priority);
+                return $queue->push($id, $priority, $timeout, $delay);
             }
         }
 
