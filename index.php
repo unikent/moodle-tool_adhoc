@@ -39,7 +39,7 @@ if ($action == 'delete' && !empty($task)) {
         'id' => $task
     ));
 
-    redirect(new \moodle_url('/admin/tool/adhoc/report.php'), get_string('success'), 1);
+    redirect(new \moodle_url('/admin/tool/adhoc/index.php'), get_string('success'), 1);
 }
 
 if ($action == 'run' && !empty($task)) {
@@ -55,7 +55,7 @@ if ($action == 'run' && !empty($task)) {
     $task = \core\task\manager::adhoc_task_from_record($record);
     if ($task) {
         $olduser = $USER;
-        $redirecturl = new \moodle_url('/admin/tool/adhoc/report.php');
+        $redirecturl = new \moodle_url('/admin/tool/adhoc/index.php');
         $redirectmessage = '';
 
         $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
@@ -126,7 +126,7 @@ if (empty($tasks)) {
     $table->define_baseurl($PAGE->url);
     $table->setup();
     foreach ($tasks as $task) {
-        $configureurl = new moodle_url('/admin/tool/adhoc/report.php', array(
+        $configureurl = new moodle_url('/admin/tool/adhoc/index.php', array(
             'action' => 'delete',
             'task' => $task->id,
             'sesskey' => sesskey()
@@ -134,7 +134,7 @@ if (empty($tasks)) {
 
         $editlink = $OUTPUT->action_icon($configureurl, new pix_icon('t/delete', get_string('deletetask', 'tool_adhoc')));
 
-        $runurl = new moodle_url('/admin/tool/adhoc/report.php', array(
+        $runurl = new moodle_url('/admin/tool/adhoc/index.php', array(
             'action' => 'run',
             'task' => $task->id,
             'sesskey' => sesskey()

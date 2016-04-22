@@ -17,7 +17,7 @@
 /**
  * Version information
  *
- * @package    tool_adhoc
+ * @package    queue_cron
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
  * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,8 +25,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'tool_adhoc';
+$plugin->component = 'queue_cron';
 $plugin->version   = 2016042200;
 $plugin->requires  = 2014051200;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '3.0 (Build: 2016042200)';
+$plugin->dependencies = array(
+    'tool_adhoc' => 2016042200
+);

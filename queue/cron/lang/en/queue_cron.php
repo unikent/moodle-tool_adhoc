@@ -15,18 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Language information
  *
- * @package    tool_adhoc
+ * @package    queue_cron
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
  * @copyright  2016 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'tool_adhoc';
-$plugin->version   = 2016042200;
-$plugin->requires  = 2014051200;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.0 (Build: 2016042200)';
+$string['pluginname'] = 'Cron queue';
+$string['plugindesc'] = 'A cron queuing plugin.';
+$string['maxtasks'] = 'Maximum tasks';
+$string['maxtasks_help'] = 'Maximum number of tasks per cron run (0 for \'no limit\')';

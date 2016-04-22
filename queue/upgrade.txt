@@ -1,0 +1,8 @@
+This files describes API changes in /admin/tool/adhoc/queue/* - plugins,
+information provided here is intended especially for developers.
+
+=== 3.0 ===
+
+* queue_*\manager must be renamed to \queue
+* tool_adhoc\queue is now a class, not an interface
+* tool_adhoc\queue now has a new method "get_supported_features" that all queue plugins should implement

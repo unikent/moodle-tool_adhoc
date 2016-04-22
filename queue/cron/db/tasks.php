@@ -15,18 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Task runner for cron.
  *
- * @package    tool_adhoc
- * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright  2016 University of Kent
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   queue_cron
+ * @author    Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright 2016 University of Kent
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'tool_adhoc';
-$plugin->version   = 2016042200;
-$plugin->requires  = 2014051200;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.0 (Build: 2016042200)';
+$tasks = array(
+    array(
+        'classname' => 'queue_cron\task\runtasks',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
+);

@@ -36,7 +36,7 @@ require_login();
 require_capability('moodle/site:config', context_system::instance());
 require_sesskey();
 
-$all = \core_component::get_plugin_list_with_class('queue', 'manager');
+$all = \core_component::get_plugin_list_with_class('queue', 'queue');
 $enabled = get_config('tool_adhoc', 'enabled_queues');
 if (!$enabled) {
     $enabled = array();

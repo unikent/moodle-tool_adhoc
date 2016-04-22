@@ -15,18 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Cron queue for the adhoc task manager.
  *
- * @package    tool_adhoc
- * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright  2016 University of Kent
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   queue_cron
+ * @author    Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright 2016 University of Kent
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->component = 'tool_adhoc';
-$plugin->version   = 2016042200;
-$plugin->requires  = 2014051200;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.0 (Build: 2016042200)';
+if ($hassiteconfig) {
+    $settings->add(new admin_setting_configtext(
+        'queue_cron/maxtasks', get_string('maxtasks', 'queue_cron'), get_string('maxtasks_help', 'queue_cron'), 0)
+    );
+}

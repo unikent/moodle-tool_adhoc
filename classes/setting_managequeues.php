@@ -77,7 +77,7 @@ class tool_adhoc_setting_managequeues extends admin_setting {
         }
 
         $query = core_text::strtolower($query);
-        $plugins = \core_component::get_plugin_list_with_class('queue', 'manager');
+        $plugins = \core_component::get_plugin_list_with_class('queue', 'queue');
         foreach ($plugins as $plugin => $fulldir) {
             if (strpos(core_text::strtolower($plugin), $query) !== false) {
                 return true;
@@ -104,13 +104,14 @@ class tool_adhoc_setting_managequeues extends admin_setting {
         $strup = get_string('up');
         $strdown = get_string('down');
         $strsettings = get_string('settings');
+        $strready = get_string('storeready', 'core_cache');
         $strenable = get_string('enable');
         $strdisable = get_string('disable');
         $struninstall = get_string('uninstallplugin', 'core_admin');
         $strversion = get_string('version');
 
         $pluginmanager = core_plugin_manager::instance();
-        $available = \core_component::get_plugin_list_with_class('queue', 'manager');
+        $available = \core_component::get_plugin_list_with_class('queue', 'queue');
         $enabled = get_config('tool_adhoc', 'enabled_queues');
         if (!$enabled) {
             $enabled = array();
@@ -137,11 +138,13 @@ class tool_adhoc_setting_managequeues extends admin_setting {
             $strversion,
             $strenable,
             $strup . '/' . $strdown,
+            $strready,
             $strsettings,
             $struninstall
         );
         $table->colclasses = array(
             'leftalign',
+            'centeralign',
             'centeralign',
             'centeralign',
             'centeralign',
@@ -158,6 +161,11 @@ class tool_adhoc_setting_managequeues extends admin_setting {
         $url = new moodle_url('/admin/tool/adhoc/queues.php', array('sesskey' => sesskey()));
         $printed = array();
         foreach ($allstores as $queue => $unused) {
+            $queueobj = \tool_adhoc\manager::get_queue($queue);
+            if (!$queueobj) {
+                continue;
+            }
+
             $plugininfo = $pluginmanager->get_plugin_info($queue);
             $version = get_config($queue, 'version');
             if ($version === false) {
@@ -216,6 +224,12 @@ class tool_adhoc_setting_managequeues extends admin_setting {
                 ++$updowncount;
             }
 
+            // Is ready check.
+            $isready = '';
+            if ($queueobj->is_ready()) {
+                $isready = $OUTPUT->pix_icon('i/valid', '1');
+            }
+
             // Add settings link.
             if (!$version) {
                 $settings = '';
@@ -234,7 +248,7 @@ class tool_adhoc_setting_managequeues extends admin_setting {
             }
 
             // Add a row to the table.
-            $table->data[] = array($icon . $displayname, $version, $hideshow, $updown, $settings, $uninstall);
+            $table->data[] = array($icon . $displayname, $version, $hideshow, $updown, $isready, $settings, $uninstall);
 
             $printed[$queue] = true;
         }

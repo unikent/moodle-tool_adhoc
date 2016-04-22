@@ -36,6 +36,20 @@ namespace tool_adhoc;
 class manager
 {
     /**
+     * Given the name of a queue, returns it's interface.
+     */
+    public static function get_queue($queue) {
+        static $map = array();
+
+        if (!isset($map[$queue])) {
+            $class = "\\$queue\\queue";
+            $map[$queue] = new $class();
+        }
+
+        return $map[$queue];
+    }
+
+    /**
      * Returns all queues in order.
      */
     public static function get_queues() {
@@ -45,10 +59,7 @@ class manager
         }
 
         $plugins = explode(',', $enabled);
-        return array_map(function($plugin) {
-            $class = "\\$plugin\\manager";
-            return new $class();
-        }, $plugins);
+        return array_map(self::get_queue, $plugins);
     }
 
     /**
@@ -67,11 +78,11 @@ class manager
     /**
      * Hook for queue_adhoc_task.
      */
-    public static function queue_adhoc_task($id, $priority = 1024) {
+    public static function queue_adhoc_task($id, $priority = 512, $timeout = 900, $delay = 0) {
         $queues = self::get_queues();
         foreach ($queues as $queue) {
             if ($queue->is_ready()) {
-                return $queue->push($id, $priority);
+                return $queue->push($id, $priority, $timeout, $delay);
             }
         }
 

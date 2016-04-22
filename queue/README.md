@@ -17,5 +17,5 @@ public static function queue_adhoc_task(adhoc_task $task) {
 }
 ```
 
-All plugins should implement "\tool_adhoc\queue" and must have a class "manager".
-See https://github.com/unikent/moodle-queue_beanstalk for an example implementation.
+All plugins should implement "\tool_adhoc\queue" and must have a class "queue".
+See 'cron' or 'https://github.com/unikent/moodle-queue_beanstalk' for example implementations.
