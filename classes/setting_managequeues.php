@@ -77,7 +77,7 @@ class tool_adhoc_setting_managequeues extends admin_setting {
         }
 
         $query = core_text::strtolower($query);
-        $plugins = \core_component::get_plugin_list_with_class('queue', 'manager');
+        $plugins = \core_component::get_plugin_list_with_class('queue', 'queue');
         foreach ($plugins as $plugin => $fulldir) {
             if (strpos(core_text::strtolower($plugin), $query) !== false) {
                 return true;
@@ -110,7 +110,7 @@ class tool_adhoc_setting_managequeues extends admin_setting {
         $strversion = get_string('version');
 
         $pluginmanager = core_plugin_manager::instance();
-        $available = \core_component::get_plugin_list_with_class('queue', 'manager');
+        $available = \core_component::get_plugin_list_with_class('queue', 'queue');
         $enabled = get_config('tool_adhoc', 'enabled_queues');
         if (!$enabled) {
             $enabled = array();

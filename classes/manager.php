@@ -46,7 +46,7 @@ class manager
 
         $plugins = explode(',', $enabled);
         return array_map(function($plugin) {
-            $class = "\\$plugin\\manager";
+            $class = "\\$plugin\\queue";
             return new $class();
         }, $plugins);
     }

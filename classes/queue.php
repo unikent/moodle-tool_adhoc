@@ -26,15 +26,53 @@
 namespace tool_adhoc;
 
 /**
- * Interface for queue managers.
+ * Base class for queue managers.
  *
  * @package   tool_adhoc
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
  * @copyright  2016 University of Kent
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface queue
+abstract class queue
 {
+    /**
+     * Supports delayed tasks.
+     */
+    const SUPPORTS_DELAYS = 1;
+
+    /**
+     * Support task priorities.
+     */
+    const SUPPORTS_PRIORITIES = 2;
+
+    /**
+     * Returns the supported features as a combined int.
+     *
+     * @param array $configuration
+     * @return int
+     */
+    public static function get_supported_features(array $configuration = array()) {
+        return 0;
+    }
+
+    /**
+     * Returns true if the store instance supports delayed tasks.
+     *
+     * @return bool
+     */
+    public function supports_delay() {
+        return $this::get_supported_features() & self::SUPPORTS_DELAYS;
+    }
+
+    /**
+     * Returns true if the store instance supports priority ordering.
+     *
+     * @return bool
+     */
+    public function supports_priority() {
+        return $this::get_supported_features() & self::SUPPORTS_PRIORITIES;
+    }
+
     /**
      * Push an item onto the queue.
      *
@@ -44,12 +82,12 @@ interface queue
      * @param  int $delay    Delay before executing task.
      * @return bool          True on success, false otherwise.
      */
-    public function push($id, $priority = 512, $timeout = 900, $delay = 0);
+    public abstract function push($id, $priority = 512, $timeout = 900, $delay = 0);
 
     /**
      * Are we ready?
      *
      * @return bool True if ready, false otherwise.
      */
-    public function is_ready();
+    public abstract function is_ready();
 }
