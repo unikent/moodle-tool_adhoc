@@ -59,7 +59,7 @@ class manager
         }
 
         $plugins = explode(',', $enabled);
-        return array_map(self::get_queue, $plugins);
+        return array_map(array("\\tool_adhoc\\manager", 'get_queue'), $plugins);
     }
 
     /**
