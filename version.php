@@ -19,14 +19,14 @@
  *
  * @package    tool_adhoc
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright  2016 University of Kent
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'tool_adhoc';
-$plugin->version   = 2016042200;
+$plugin->version   = 2016052500;
 $plugin->requires  = 2014051200;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.0 (Build: 2016042200)';
+$plugin->release = '3.1 (Build: 2016052500)';
