@@ -19,7 +19,7 @@
  *
  * @package   queue_cron
  * @author    Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright 2016 University of Kent
+ * @copyright 2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,7 +37,7 @@ use Pheanstalk\PheanstalkInterface;
  *
  * @package   queue_cron
  * @author    Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright 2016 University of Kent
+ * @copyright 2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class queue extends \tool_adhoc\queue

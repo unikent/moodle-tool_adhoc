@@ -19,7 +19,7 @@
  *
  * @package    tool_adhoc
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright  2016 University of Kent
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,8 +29,8 @@ namespace tool_adhoc;
  * Adhoc manager methods.
  *
  * @package   tool_adhoc
- * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright  2016 University of Kent
+ * @author    Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright 2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager
@@ -59,7 +59,7 @@ class manager
         }
 
         $plugins = explode(',', $enabled);
-        return array_map(self::get_queue, $plugins);
+        return array_map(array("\\tool_adhoc\\manager", 'get_queue'), $plugins);
     }
 
     /**

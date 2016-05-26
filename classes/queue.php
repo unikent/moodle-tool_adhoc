@@ -19,7 +19,7 @@
  *
  * @package    tool_adhoc
  * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright  2016 University of Kent
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,8 +29,8 @@ namespace tool_adhoc;
  * Base class for queue managers.
  *
  * @package   tool_adhoc
- * @author     Skylar Kelty <S.Kelty@kent.ac.uk>
- * @copyright  2016 University of Kent
+ * @author    Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright 2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class queue
