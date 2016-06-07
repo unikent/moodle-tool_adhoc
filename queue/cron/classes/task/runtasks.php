@@ -37,9 +37,13 @@ class runtasks extends \core\task\scheduled_task
     public function execute() {
         $config = get_config('queue_cron');
 
-        $tasks = $DB->get_recordset('task_adhoc', null, 0, $config->maxtasks);
-        \tool_adhoc\manager::run_tasks($tasks);
-        $tasks->close();
+        $count = 0;
+        $sql = 'SELECT * FROM {task_adhoc} WHERE nextruntime >= :time LIMIT 1';
+        while (($config->maxtasks == 0 || $count <= $config->maxtasks) &&
+                $record = $DB->get_record_sql($sql, array('time' => time()))) {
+            \tool_adhoc\manager::run_task($record);
+            $count++;
+        }
 
         set_config('lastran', time(), 'queue_cron');
 

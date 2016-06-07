@@ -71,13 +71,10 @@ if ($options['runall'] || !empty($options['execute'])) {
 }
 
 if ($options['runall']) {
-    // Run all tasks.
-    $tasks = $DB->get_records('task_adhoc');
-    if (!empty($tasks)) {
-        cli_writeln("Running " . count($tasks) . " tasks.");
-        \tool_adhoc\manager::run_tasks($tasks);
-    } else {
-        cli_writeln("No tasks to run!");
+    // Run all tasks, don't worry about order or delays.
+    $sql = 'SELECT * FROM {task_adhoc} WHERE nextruntime >= :time LIMIT 1';
+    while ($record = $DB->get_record_sql($sql, array('time' => time()))) {
+        \tool_adhoc\manager::run_task($record);
     }
 
     exit(0);
@@ -105,7 +102,7 @@ if (!empty($options['execute'])) {
     ), '*', \MUST_EXIST);
 
     // Execute.
-    \tool_adhoc\manager::run_tasks(array($record));
+    \tool_adhoc\manager::run_task($record);
 }
 
 if (!empty($options['delete'])) {

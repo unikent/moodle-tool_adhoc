@@ -90,91 +90,71 @@ class manager
     }
 
     /**
-     * Run a given set of tasks.
+     * Run an adhoc task.
      *
-     * @param array $records An array of adhoc DB records to run.
+     * @param stdClass $record The task to run.
      * @return bool True if we succeeded, false if we didnt.
      */
-    public static function run_tasks($records, $ignoreblocking = false) {
-        global $CFG, $DB;
+    public static function run_task($record) {
+        global $DB;
 
-        require_once("{$CFG->libdir}/clilib.php");
-
-        // Get the cron lock factory.
-        $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
-        $cronlock = null;
-
-        foreach ($records as $record) {
-            // Grab the task.
-            $task = \core\task\manager::adhoc_task_from_record($record);
-            if (!$task) {
-                cli_problem("Task '{$record->id}' could not be loaded.");
-                continue;
-            }
-
-            if ($ignoreblocking && $task->is_blocking()) {
-                continue;
-            }
-
-            // Set pre-task performance vars.
-            $predbqueries = $DB->perf_get_queries();
-            $pretime = microtime(true);
-
-            try {
-                // Grab a task lock.
-                if (!$lock = $cronlockfactory->get_lock('adhoc_' . $record->id, 10)) {
-                    cli_problem('Cannot obtain task lock');
-                    continue;
-                }
-
-                // Set lock info on task.
-                $task->set_lock($lock);
-                if ($task->is_blocking()) {
-                    if (!$cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
-                        cli_problem('Cannot obtain cron lock');
-                        continue;
-                    }
-                    $task->set_cron_lock($cronlock);
-                }
-
-                // Run the task.
-                $task->execute();
-
-                // Echo out performance info.
-                if (isset($predbqueries)) {
-                    cli_writeln("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-                    cli_writeln("... used " . (microtime(1) - $pretime) . " seconds");
-                }
-                cli_writeln("Task {$record->id} completed.");
-
-                // Set the task as complete.
-                \core\task\manager::adhoc_task_complete($task);
-            } catch (\Exception $e) {
-                if ($DB->is_transaction_started()) {
-                    $DB->force_transaction_rollback();
-                }
-
-                cli_writeln("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-                cli_writeln("... used " . (microtime(true) - $pretime) . " seconds");
-                cli_problem("Task failed: " . $e->getMessage());
-
-                // We failed.
-                \core\task\manager::adhoc_task_failed($task);
-
-                // Release the global lock before we throw errors.
-                if ($cronlock) {
-                    $cronlock->release();
-                    unset($cronlock);
-                }
-
-                throw $e;
-            }
+        // Grab the task.
+        $task = \core\task\manager::adhoc_task_from_record($record);
+        if (!$task) {
+            throw new \moodle_exception("Task '{$record->id}' could not be loaded.");
         }
 
-        // Release the global lock.
-        if ($cronlock) {
-            $cronlock->release();
-            unset($cronlock);
+        // Grab a task lock.
+        $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
+        if (!$tasklock = $cronlockfactory->get_lock('adhoc_' . $record->id, 600)) {
+            debugging('Cannot obtain task lock.');
+            return false;
+        }
+
+        // Set lock info on task.
+        $task->set_lock($tasklock);
+        if ($task->is_blocking()) {
+            if (!$cronlock = $cronlockfactory->get_lock('core_cron', 10)) {
+                debugging('Cannot obtain cron lock');
+                return false;
+            }
+
+            $task->set_cron_lock($cronlock);
+        }
+
+        try {
+            // Run the task.
+            $task->execute();
+
+            // Set the task as complete.
+            \core\task\manager::adhoc_task_complete($task);
+        } catch (\Exception $e) {
+            if ($DB->is_transaction_started()) {
+                $DB->force_transaction_rollback();
+            }
+
+            \core\task\manager::adhoc_task_failed($task);
+
+            throw $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * Run a given set of tasks.
+     * You should only call this with a set of tasks you know will
+     * not complete elsewhere.
+     *
+     * @param array $records An array of adhoc DB records to run.
+     * @param bool $ignoreblocking DEPRECATED - Don't block, even when the task says we should.
+     * @return bool True if we succeeded, false if we didnt.
+     */
+    public static function run_tasks($records, $ignoreblocking = null) {
+        debugging("This method is deprecated, you should use run_task and only run tasks you currently own.");
+
+        foreach ($records as $record) {
+            self::run_task($record);
         }
     }
 }
